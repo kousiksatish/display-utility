@@ -1,0 +1,10 @@
+build
+node_modules
+src
+headers
+native_src
+.gitignore
+.npmignore
+binding.gyp
+tsconfig.json
+tslint.json
