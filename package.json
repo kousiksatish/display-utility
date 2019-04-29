@@ -1,0 +1,67 @@
+{
+  "name": "@idrive-remotepc/display-utility",
+  "version": "0.0.2",
+  "description": "Utility to retrieve the information about the desktop display like number of outputs, output names, current resolution and list of resolutions using xrandr.",
+  "homepage": "https://github.com/idrive-remotepc/display-utility/blob/master/README.md",
+  "bugs": {
+    "url": "https://github.com/idrive-remotepc/display-utility/issues"
+  },
+  "author": "RemotePC™ Powered by IDrive Inc. <support@remotepc.com> (https://www.remotepc.com/)",
+  "license": "MIT",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "release/index.js",
+  "scripts": {
+    "transpile": "tsc --build tsconfig.json",
+    "lint": "tslint --project tsconfig.json --config tslint.json --fix",
+    "prepublishOnly": "npm i && npm run lint && npm run transpile",
+    "test": "npm run prepublishOnly && node release/test.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run lint",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idrive-remotepc/display-utility.git"
+  },
+  "keywords": [
+    "X11",
+    "Xrandr",
+    "Xtst",
+    "resolution",
+    "display",
+    "screen",
+    "output",
+    "linux",
+    "mode",
+    "display-utility"
+  ],
+  "devDependencies": {
+    "@types/bindings": "^1.3.0",
+    "husky": "^2.1.0",
+    "lint-staged": "^8.1.5",
+    "tslint": "^5.16.0",
+    "tslint-microsoft-contrib": "^6.1.1",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^1.6.3"
+  },
+  "files": [
+    "build/Release/.deps/Release/display-utility.node.d",
+    "build/Release/display-utility.node"
+  ]
+}
