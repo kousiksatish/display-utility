@@ -31,12 +31,12 @@ std::unique_ptr<DisplayUtilityX11> DisplayUtilityX11::Create()
     return std::unique_ptr<DisplayUtilityX11>(new DisplayUtilityX11());
 }
 
-bool DisplayUtilityX11::TryGetNumberOfOutputs(unsigned int *numberOfOutputs)
+bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs)
 {
     unsigned int numberOfOutputsConnected = 0;
     if (resources_.Refresh(display_, root_))
     {
-        *numberOfOutputs = resources_.get()->noutput;
+        RROutput * tmpOutputs = new RROutput[resources_.get()->noutput];
         RROutput currentRROutput;
         for (int outputIndex = 0; outputIndex < resources_.get()->noutput; outputIndex += 1)
         {
@@ -51,19 +51,20 @@ bool DisplayUtilityX11::TryGetNumberOfOutputs(unsigned int *numberOfOutputs)
                 std::cout << "Could not get output info of index: " << outputIndex << std::endl;
                 return false;
             }
-            if (outputInfo->connection == 1)
+            if (outputInfo->connection == 0)
             {
-                numberOfOutputsConnected += 1;
+                tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
             }
             XRRFreeOutputInfo(outputInfo);
         }
         *numberOfOutputs = numberOfOutputsConnected;
+        *connectedOutputs = tmpOutputs;
         return true;
     }
     return false;
 }
 
-std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(const unsigned int outputIndex)
+std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
 {
     int height = 0;
     int width = 0;
@@ -72,12 +73,7 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(const 
     {
         return currentResolution;
     }
-    RROutput currentRROutput;
-    if (resources_.TryGetOutput(outputIndex, &currentRROutput) == false)
-    {
-        return currentResolution;
-    }
-    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, currentRROutput);
+    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
     if (outputInfo != nullptr && outputInfo->crtc)
     {
         XRRCrtcInfo *crtc;
@@ -106,19 +102,14 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(const 
     return currentResolution;
 }
 
-std::set<OutputResolution> DisplayUtilityX11::GetResolutions(const unsigned int outputIndex)
+std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 {
     std::set<OutputResolution> resolutionsSet;
     resources_.Refresh(display_, root_);
     // Impose a minimum size of 640x480, since anything smaller
     // doesn't seem very useful.
     OutputResolution *minimumDesktopResolution = new OutputResolution(640, 480, 0L);
-    RROutput currentRROutput;
-    if (resources_.TryGetOutput(outputIndex, &currentRROutput) == false)
-    {
-        return resolutionsSet;
-    }
-    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, currentRROutput);
+    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
     if (outputInfo->crtc)
     {
         XRRCrtcInfo *crtc;
@@ -146,19 +137,14 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(const unsigned int 
     return resolutionsSet;
 }
 
-std::string DisplayUtilityX11::GetOutputName(const unsigned int outputIndex)
+std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 {
     std::string outputName;
     if (resources_.Refresh(display_, root_) == false)
     {
         return outputName;
     }
-    RROutput currentRROutput;
-    if (resources_.TryGetOutput(outputIndex, &currentRROutput) == false)
-    {
-        return outputName;
-    }
-    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, currentRROutput);
+    XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
     outputName = std::string(outputInfo->name);
     XRRFreeOutputInfo(outputInfo);
     return outputName;
