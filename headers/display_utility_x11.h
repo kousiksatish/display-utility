@@ -13,10 +13,10 @@ public:
     ~DisplayUtilityX11();
 
     // DesktopResizer interface
-    bool TryGetNumberOfOutputs(unsigned int *numberOfOutputs);
-    std::unique_ptr<OutputResolution> GetCurrentResolution(const unsigned int outputIndex);
-    std::set<OutputResolution> GetResolutions(const unsigned int outputIndex);
-    std::string GetOutputName(const unsigned int outputIndex);
+    bool TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs);
+    std::unique_ptr<OutputResolution> GetCurrentResolution(RROutput rROutput);
+    std::set<OutputResolution> GetResolutions(RROutput rROutput);
+    std::string GetOutputName(RROutput rROutput);
 
 private:
     Display *display_;

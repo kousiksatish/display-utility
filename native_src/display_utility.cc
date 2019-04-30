@@ -3,21 +3,30 @@
 #include "../headers/display_utility_x11.h"
 using namespace remoting;
 
-Napi::Number GetNumberOfOutputs(const Napi::CallbackInfo &info)
+Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+    Napi::Array connectedOutputArray;
+
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
     unsigned int numberOfOutputs = 0;
-    if (desktopInfo->TryGetNumberOfOutputs(&numberOfOutputs))
+    RROutput *connectedOutputs = nullptr;
+    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
     {
-        std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
+        if (connectedOutputs != nullptr)
+        {
+            std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
+            connectedOutputArray = Napi::Array::New(env);
+            for (unsigned int i = 0; i < numberOfOutputs; i += 1)
+            {
+                connectedOutputArray.Set(i, Napi::Number::New(env, connectedOutputs[i]));
+            }
+            delete [] connectedOutputs;
+        }
+        return connectedOutputArray;
     }
-    else
-    {
-        Napi::Error::New(env, "Could not get the number of outputs of the display. Please try again.");
-    }
-
-    return Napi::Number::New(env, numberOfOutputs);
+    Napi::Error::New(env, "Could not get the number of outputs of the display. Please try again.");
+    return connectedOutputArray;
 }
 
 Napi::String GetOutputName(const Napi::CallbackInfo &info)
@@ -116,7 +125,7 @@ Napi::Array GetResolutions(const Napi::CallbackInfo &info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set(Napi::String::New(env, "getNumberOfOutputs"), Napi::Function::New(env, GetNumberOfOutputs));
+    exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
     exports.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
     exports.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
     exports.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
