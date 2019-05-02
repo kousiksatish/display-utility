@@ -21,7 +21,7 @@ Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
             {
                 connectedOutputArray.Set(i, Napi::Number::New(env, connectedOutputs[i]));
             }
-            delete [] connectedOutputs;
+            delete[] connectedOutputs;
         }
         return connectedOutputArray;
     }
@@ -123,12 +123,38 @@ Napi::Array GetResolutions(const Napi::CallbackInfo &info)
     return resolutionArray;
 }
 
+void SetResolution(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 2)
+    {
+        Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
+        return;
+    }
+
+    if (!info[0].IsString() || !info[1].IsString())
+    {
+        Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return;
+    }
+
+    std::string outputName = info[0].As<Napi::String>();
+    std::string resolution = info[1].As<Napi::String>();
+
+    std::string setResolutionCommnad = "xrandr --output " + outputName + " --mode " + resolution;
+    int return_value = system(setResolutionCommnad.c_str());
+    std::cout << "The value returned by command " << setResolutionCommnad << " was: " << return_value << std::endl;
+    return;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
     exports.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
     exports.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
     exports.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
+    exports.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
     return exports;
 }
 
