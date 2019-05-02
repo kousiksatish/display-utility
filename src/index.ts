@@ -17,4 +17,6 @@ export interface INativeDisplayUtility {
     getCurrentResolution(outputIndex: number): IResolution;
     getResolutions(outputIndex: number): IResolution[];
     setResolution(outputName: string, resolution: string): void;
+    makeScreenBlank(): void;
+    reverseBlankScreen(): void;
 }

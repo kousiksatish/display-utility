@@ -148,6 +148,58 @@ void SetResolution(const Napi::CallbackInfo &info)
     return;
 }
 
+void MakeScreenBlank(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::string makeScreenBlankCommand;
+            for (unsigned int i = 0; i < numberOfOutputs; i++)
+            {
+                makeScreenBlankCommand = "xrandr --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 0";
+                int returnValue = system(makeScreenBlankCommand.c_str());
+                std::cout << "The value returned by command " << makeScreenBlankCommand << " was: " << returnValue << std::endl;
+                connectedOutputs++;
+            }
+            return;
+        }
+    }
+    Napi::Error::New(env, "Could not make the screen blank. Please try again.");
+    return;
+}
+
+void ReverseBlankScreen(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::string reverseBlankScreenCommand;
+            for (unsigned int i = 0; i < numberOfOutputs; i++)
+            {
+                reverseBlankScreenCommand = "xrandr --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 1";
+                int returnValue = system(reverseBlankScreenCommand.c_str());
+                std::cout << "The value returned by command " << reverseBlankScreenCommand << " was: " << returnValue << std::endl;
+                connectedOutputs++;
+            }
+            return;
+        }
+    }
+    Napi::Error::New(env, "Could not reverse the screen blank. Please try again.");
+    return;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
@@ -155,6 +207,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
     exports.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
     exports.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
+    exports.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
+    exports.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
     return exports;
 }
 
