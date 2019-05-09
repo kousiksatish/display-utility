@@ -1,10 +1,15 @@
 import bindings from 'bindings';
+import lockSystem from 'lock-system';
 
 /**
  * DisplayUtility will retrieve the information about the desktop display.
  */
 // tslint:disable-next-line: no-unsafe-any
 export const displayUtility: INativeDisplayUtility = bindings('display-utility');
+
+export const lockUtility: ILockUtility = {
+    lockScreen: lockSystem
+};
 
 export interface IResolution {
     width: number;
@@ -19,4 +24,8 @@ export interface INativeDisplayUtility {
     setResolution(outputName: string, resolution: string): void;
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
+}
+
+interface ILockUtility {
+    lockScreen(): void;
 }

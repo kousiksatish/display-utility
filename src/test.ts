@@ -1,4 +1,5 @@
-import { displayUtility } from './index';
+import { displayUtility, lockUtility } from './index';
 
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getConnectedOutputs());
+lockUtility.lockScreen();
