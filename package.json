@@ -59,5 +59,12 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "node-addon-api": "^1.6.3"
-  }
+  },
+  "files": [
+    "headers/*",
+    "native_src/*",
+    "binding.gyp",
+    "release/index.js",
+    "release/index.d.ts"
+  ]
 }
