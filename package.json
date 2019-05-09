@@ -18,6 +18,7 @@
   "scripts": {
     "transpile": "tsc --build tsconfig.json",
     "lint": "tslint --project tsconfig.json --config tslint.json --fix",
+    "prepare": "npm run lint && npm run transpile",
     "prepublishOnly": "npm i && npm run lint && npm run transpile",
     "test": "npm run prepublishOnly && node release/test.js"
   },
