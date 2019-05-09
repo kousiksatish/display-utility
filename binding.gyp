@@ -6,9 +6,9 @@
       "include_dirs" : [
         "<!@(node -p \"require('node-addon-api').include\")"],
       "libraries": [
-        "/usr/lib/x86_64-linux-gnu/libX11.so",
-        "/usr/lib/x86_64-linux-gnu/libXrandr.so",
-        "/usr/lib/x86_64-linux-gnu/libXtst.so"],
+        "-lX11",
+        "-lXrandr",
+        "-lXtst"],
       "target_name": "display-utility",
       "sources": [ 
         "native_src/display_utility.cc", 
