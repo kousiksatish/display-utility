@@ -159,14 +159,14 @@ void MakeScreenBlank(const Napi::CallbackInfo &info)
     {
         if (connectedOutputs != nullptr)
         {
-            std::string makeScreenBlankCommand;
+            std::string makeScreenBlankCommand = "xrandr";
             for (unsigned int i = 0; i < numberOfOutputs; i++)
             {
-                makeScreenBlankCommand = "xrandr --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 0";
-                int returnValue = system(makeScreenBlankCommand.c_str());
-                std::cout << "The value returned by command " << makeScreenBlankCommand << " was: " << returnValue << std::endl;
+                makeScreenBlankCommand += " --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 0";
                 connectedOutputs++;
             }
+            int returnValue = system(makeScreenBlankCommand.c_str());
+            std::cout << "The value returned by command " << makeScreenBlankCommand << " was: " << returnValue << std::endl;
             return;
         }
     }
@@ -185,14 +185,14 @@ void ReverseBlankScreen(const Napi::CallbackInfo &info)
     {
         if (connectedOutputs != nullptr)
         {
-            std::string reverseBlankScreenCommand;
+            std::string reverseBlankScreenCommand = "xrandr";
             for (unsigned int i = 0; i < numberOfOutputs; i++)
             {
-                reverseBlankScreenCommand = "xrandr --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 1";
-                int returnValue = system(reverseBlankScreenCommand.c_str());
-                std::cout << "The value returned by command " << reverseBlankScreenCommand << " was: " << returnValue << std::endl;
+                reverseBlankScreenCommand += " --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 1";
                 connectedOutputs++;
             }
+            int returnValue = system(reverseBlankScreenCommand.c_str());
+            std::cout << "The value returned by command " << reverseBlankScreenCommand << " was: " << returnValue << std::endl;
             return;
         }
     }
