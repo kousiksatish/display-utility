@@ -16,7 +16,7 @@ export interface IResolution {
     height: number;
 }
 
-export interface INativeDisplayUtility {
+interface INativeDisplayUtility {
     getConnectedOutputs(): number[];
     getOutputName(outputIndex: number): string;
     getCurrentResolution(outputIndex: number): IResolution;
