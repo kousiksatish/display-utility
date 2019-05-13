@@ -5,4 +5,4 @@ console.log(displayUtility.getConnectedOutputs());
 // lockUtility.lockScreen();
 
 // tslint:disable-next-line:no-console
-console.log(displayUtility.getPrimaryOutputIndex());
+console.log(displayUtility.getPrimaryRROutput());

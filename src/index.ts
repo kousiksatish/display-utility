@@ -24,7 +24,7 @@ interface INativeDisplayUtility {
     setResolution(outputName: string, resolution: string): void;
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
-    getPrimaryOutputIndex(): number;
+    getPrimaryRROutput(): number;
 }
 
 interface ILockUtility {

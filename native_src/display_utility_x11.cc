@@ -150,7 +150,7 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
     return outputName;
 }
 
-RROutput DisplayUtilityX11::GetPrimaryOutputIndex()
+RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
     return XRRGetOutputPrimary(display_, root_);
 }
