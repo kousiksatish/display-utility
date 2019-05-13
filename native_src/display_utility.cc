@@ -46,11 +46,11 @@ Napi::String GetOutputName(const Napi::CallbackInfo &info)
         return outputName;
     }
 
-    unsigned int outputIndex = info[0].As<Napi::Number>().Int32Value();
+    unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
 
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
 
-    return Napi::String::New(env, desktopInfo->GetOutputName(outputIndex));
+    return Napi::String::New(env, desktopInfo->GetOutputName(rROutput));
 }
 
 Napi::Object GetCurrentResolution(const Napi::CallbackInfo &info)
@@ -70,9 +70,9 @@ Napi::Object GetCurrentResolution(const Napi::CallbackInfo &info)
         return currentResolution;
     }
 
-    unsigned int outputIndex = info[0].As<Napi::Number>().Int32Value();
+    unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(outputIndex);
+    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(rROutput);
     if (resolution != nullptr)
     {
         std::cout << "current Resolution : " << resolution->width() << "x" << resolution->height() << std::endl;
@@ -104,9 +104,9 @@ Napi::Array GetResolutions(const Napi::CallbackInfo &info)
         return resolutionArray;
     }
 
-    unsigned int outputIndex = info[0].As<Napi::Number>().Int32Value();
+    unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    std::set<OutputResolution> resolutionsSet = desktopInfo->GetResolutions(outputIndex);
+    std::set<OutputResolution> resolutionsSet = desktopInfo->GetResolutions(rROutput);
     if (resolutionsSet.size() > 0)
     {
         resolutionArray = Napi::Array::New(env);
@@ -139,10 +139,10 @@ void SetResolution(const Napi::CallbackInfo &info)
         return;
     }
 
-    unsigned int outputIndex = info[0].As<Napi::Number>().Int32Value();
+    unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
     
-    std::string outputName = desktopInfo->GetOutputName(outputIndex);
+    std::string outputName = desktopInfo->GetOutputName(rROutput);
     std::string width = info[1].ToObject().Get("width").ToString();
     std::string height = info[1].ToObject().Get("height").ToString();
     std::string resolution = width + "x" + height;

@@ -18,10 +18,10 @@ export interface IResolution {
 
 interface INativeDisplayUtility {
     getConnectedOutputs(): number[];
-    getOutputName(outputIndex: number): string;
-    getCurrentResolution(outputIndex: number): IResolution;
-    getResolutions(outputIndex: number): IResolution[];
-    setResolution(outputIndex: number, resolution: IResolution): void;
+    getOutputName(rROutput: number): string;
+    getCurrentResolution(rROutput: number): IResolution;
+    getResolutions(rROutput: number): IResolution[];
+    setResolution(rROutput: number, resolution: IResolution): void;
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
 }
