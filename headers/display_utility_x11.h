@@ -17,6 +17,7 @@ public:
     std::unique_ptr<OutputResolution> GetCurrentResolution(RROutput rROutput);
     std::set<OutputResolution> GetResolutions(RROutput rROutput);
     std::string GetOutputName(RROutput rROutput);
+    RROutput GetPrimaryOutputIndex();
 
 private:
     Display *display_;
