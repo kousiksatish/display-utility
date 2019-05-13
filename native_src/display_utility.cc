@@ -133,13 +133,16 @@ void SetResolution(const Napi::CallbackInfo &info)
         return;
     }
 
-    if (!info[0].IsString() || !info[1].IsObject() || !info[1].ToObject().Has("width") || !info[1].ToObject().Has("height"))
+    if (!info[0].IsNumber() || !info[1].IsObject() || !info[1].ToObject().Has("width") || !info[1].ToObject().Has("height"))
     {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return;
     }
 
-    std::string outputName = info[0].As<Napi::String>();
+    unsigned int outputIndex = info[0].As<Napi::Number>().Int32Value();
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    
+    std::string outputName = desktopInfo->GetOutputName(outputIndex);
     std::string width = info[1].ToObject().Get("width").ToString();
     std::string height = info[1].ToObject().Get("height").ToString();
     std::string resolution = width + "x" + height;
