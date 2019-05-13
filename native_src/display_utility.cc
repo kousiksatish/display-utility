@@ -200,6 +200,15 @@ void ReverseBlankScreen(const Napi::CallbackInfo &info)
     return;
 }
 
+Napi::Number GetPrimaryRROutput(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    RROutput outputIndex = desktopInfo->GetPrimaryRROutput();
+
+    return Napi::Number::New(env, outputIndex);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
@@ -209,6 +218,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
     exports.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
     exports.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
+    exports.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
     return exports;
 }
 

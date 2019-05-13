@@ -150,4 +150,9 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
     return outputName;
 }
 
+RROutput DisplayUtilityX11::GetPrimaryRROutput()
+{
+    return XRRGetOutputPrimary(display_, root_);
+}
+
 } // namespace remoting
