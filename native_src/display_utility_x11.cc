@@ -38,6 +38,8 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
     {
         RROutput * tmpOutputs = new RROutput[resources_.get()->noutput];
         RROutput currentRROutput;
+        RROutput primaryRROutput = XRRGetOutputPrimary(display_, root_);
+        int primaryOutputIndex = 0;
         for (int outputIndex = 0; outputIndex < resources_.get()->noutput; outputIndex += 1)
         {
             if (resources_.TryGetOutput(outputIndex, &currentRROutput) == false)
@@ -55,8 +57,22 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
             {
                 tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
             }
+            if (currentRROutput == primaryRROutput)
+            {
+                primaryOutputIndex = outputIndex;
+            }
             XRRFreeOutputInfo(outputInfo);
         }
+        
+        // If primary output not in first index
+        if (primaryOutputIndex != 0)
+        {
+            // Swap primary output to first index
+            RROutput outputAtFirstIndex = tmpOutputs[0];
+            tmpOutputs[0] = tmpOutputs[primaryOutputIndex];
+            tmpOutputs[primaryOutputIndex] = outputAtFirstIndex;
+        }
+
         *numberOfOutputs = numberOfOutputsConnected;
         *connectedOutputs = tmpOutputs;
         return true;
