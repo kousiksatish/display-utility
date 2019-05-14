@@ -67,16 +67,10 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
         // If primary output not in first index
         if (primaryOutputIndex != 0)
         {
-            // Place primary output at first index
+            // Swap primary output to first index
             RROutput outputAtFirstIndex = tmpOutputs[0];
-            tmpOutputs[0] = primaryRROutput;
-            // Move all other RROutput from 1...primaryOutputIndex-1 to 2...primaryOutputIndex
-            for(int outputIndex = 1; outputIndex < primaryOutputIndex; outputIndex++)
-            {
-                tmpOutputs[outputIndex+1] = tmpOutputs[outputIndex];
-            }
-            // Move RROutput which was in first index to second index
-            tmpOutputs[1] = outputAtFirstIndex;
+            tmpOutputs[0] = tmpOutputs[primaryOutputIndex];
+            tmpOutputs[primaryOutputIndex] = outputAtFirstIndex;
         }
 
         *numberOfOutputs = numberOfOutputsConnected;
