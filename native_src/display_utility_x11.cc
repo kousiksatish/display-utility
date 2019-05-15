@@ -31,8 +31,17 @@ std::unique_ptr<DisplayUtilityX11> DisplayUtilityX11::Create()
     return std::unique_ptr<DisplayUtilityX11>(new DisplayUtilityX11());
 }
 
+int handler(Display * d, XErrorEvent * e)
+{
+    std::cerr << "Error code: " << int(e->error_code) << std::endl;
+    return 0;
+}
+
 bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs)
 {
+    // Handle X Errors
+    XSetErrorHandler(handler);
+
     unsigned int numberOfOutputsConnected = 0;
     if (resources_.Refresh(display_, root_))
     {
@@ -82,6 +91,9 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
 
 std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
 {
+    // Handler for X errors
+    XSetErrorHandler(handler);
+
     int height = 0;
     int width = 0;
     std::unique_ptr<OutputResolution> currentResolution = nullptr;
@@ -120,13 +132,16 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
 
 std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 {
+    // Handler for X errors
+    XSetErrorHandler(handler);
+
     std::set<OutputResolution> resolutionsSet;
     resources_.Refresh(display_, root_);
     // Impose a minimum size of 640x480, since anything smaller
     // doesn't seem very useful.
     OutputResolution *minimumDesktopResolution = new OutputResolution(640, 480, 0L);
     XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
-    if (outputInfo->crtc)
+    if (outputInfo != nullptr && outputInfo->crtc)
     {
         XRRCrtcInfo *crtc;
         crtc = XRRGetCrtcInfo(display_, resources_.get(), outputInfo->crtc);
@@ -155,19 +170,27 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 
 std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 {
+    // Handler for X errors
+    XSetErrorHandler(handler);
     std::string outputName;
     if (resources_.Refresh(display_, root_) == false)
     {
         return outputName;
     }
     XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
-    outputName = std::string(outputInfo->name);
+    if (outputInfo != nullptr) 
+    {
+        outputName = std::string(outputInfo->name);
+    }
     XRRFreeOutputInfo(outputInfo);
     return outputName;
 }
 
 RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
+    // Handler for X errors
+    XSetErrorHandler(handler);
+    
     return XRRGetOutputPrimary(display_, root_);
 }
 
