@@ -8,7 +8,7 @@ namespace remoting
 
 int DisplayUtilityX11::handler(Display *d, XErrorEvent *e)
 {
-    int length = 100;
+    int length = 1000;
     char errorText[length];
     XGetErrorText(d, e->error_code, errorText, length);
     std::cerr << "XLib Error: " << int(e->error_code) 
