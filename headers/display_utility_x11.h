@@ -26,6 +26,7 @@ private:
     ScreenResources resources_;
     bool has_randr_;
 
+    static int handler(Display *d, XErrorEvent *e);
 
     DisplayUtilityX11();
 

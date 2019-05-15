@@ -6,6 +6,17 @@
 namespace remoting
 {
 
+int DisplayUtilityX11::handler(Display *d, XErrorEvent *e)
+{
+    int length = 100;
+    char errorText[length];
+    XGetErrorText(d, e->error_code, errorText, length);
+    std::cerr << "XLib Error: " << int(e->error_code) 
+            << " - " << errorText
+            << std::endl;
+    return 0;
+}
+
 DisplayUtilityX11::DisplayUtilityX11()
     : display_(XOpenDisplay(nullptr)),
       screen_(DefaultScreen(display_)),
@@ -17,6 +28,9 @@ DisplayUtilityX11::DisplayUtilityX11()
     has_randr_ = XRRQueryExtension(display_, &rr_event_base, &rr_error_base);
 
     XRRSelectInput(display_, root_, RRScreenChangeNotifyMask);
+
+    // Set handler for XErrors
+    XSetErrorHandler(DisplayUtilityX11::handler);
 }
 
 DisplayUtilityX11::~DisplayUtilityX11()
@@ -31,17 +45,8 @@ std::unique_ptr<DisplayUtilityX11> DisplayUtilityX11::Create()
     return std::unique_ptr<DisplayUtilityX11>(new DisplayUtilityX11());
 }
 
-int handler(Display * d, XErrorEvent * e)
-{
-    std::cerr << "Error code: " << int(e->error_code) << std::endl;
-    return 0;
-}
-
 bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs)
 {
-    // Handle X Errors
-    XSetErrorHandler(handler);
-
     unsigned int numberOfOutputsConnected = 0;
     if (resources_.Refresh(display_, root_))
     {
@@ -91,9 +96,6 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
 
 std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
 {
-    // Handler for X errors
-    XSetErrorHandler(handler);
-
     int height = 0;
     int width = 0;
     std::unique_ptr<OutputResolution> currentResolution = nullptr;
@@ -132,9 +134,6 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
 
 std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 {
-    // Handler for X errors
-    XSetErrorHandler(handler);
-
     std::set<OutputResolution> resolutionsSet;
     resources_.Refresh(display_, root_);
     // Impose a minimum size of 640x480, since anything smaller
@@ -170,15 +169,13 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 
 std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 {
-    // Handler for X errors
-    XSetErrorHandler(handler);
     std::string outputName;
     if (resources_.Refresh(display_, root_) == false)
     {
         return outputName;
     }
     XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
-    if (outputInfo != nullptr) 
+    if (outputInfo != nullptr)
     {
         outputName = std::string(outputInfo->name);
     }
@@ -188,9 +185,6 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 
 RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
-    // Handler for X errors
-    XSetErrorHandler(handler);
-    
     return XRRGetOutputPrimary(display_, root_);
 }
 
