@@ -1,6 +1,6 @@
 {
   "name": "@idrive-remotepc/display-utility",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Utility to retrieve the information about the desktop display like number of outputs, output names, current resolution and list of resolutions using xrandr.",
   "homepage": "https://github.com/idrive-remotepc/display-utility/blob/master/README.md",
   "bugs": {

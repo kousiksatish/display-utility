@@ -6,6 +6,17 @@
 namespace remoting
 {
 
+int DisplayUtilityX11::handler(Display *d, XErrorEvent *e)
+{
+    int length = 1000;
+    char errorText[length];
+    XGetErrorText(d, e->error_code, errorText, length);
+    std::cerr << "XLib Error: " << int(e->error_code) 
+            << " - " << errorText
+            << std::endl;
+    return 0;
+}
+
 DisplayUtilityX11::DisplayUtilityX11()
     : display_(XOpenDisplay(nullptr)),
       screen_(DefaultScreen(display_)),
@@ -17,6 +28,9 @@ DisplayUtilityX11::DisplayUtilityX11()
     has_randr_ = XRRQueryExtension(display_, &rr_event_base, &rr_error_base);
 
     XRRSelectInput(display_, root_, RRScreenChangeNotifyMask);
+
+    // Set handler for XErrors
+    XSetErrorHandler(DisplayUtilityX11::handler);
 }
 
 DisplayUtilityX11::~DisplayUtilityX11()
@@ -126,7 +140,7 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
     // doesn't seem very useful.
     OutputResolution *minimumDesktopResolution = new OutputResolution(640, 480, 0L);
     XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
-    if (outputInfo->crtc)
+    if (outputInfo != nullptr && outputInfo->crtc)
     {
         XRRCrtcInfo *crtc;
         crtc = XRRGetCrtcInfo(display_, resources_.get(), outputInfo->crtc);
@@ -161,7 +175,10 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
         return outputName;
     }
     XRROutputInfo *outputInfo = resources_.GetOutputInfo(display_, rROutput);
-    outputName = std::string(outputInfo->name);
+    if (outputInfo != nullptr)
+    {
+        outputName = std::string(outputInfo->name);
+    }
     XRRFreeOutputInfo(outputInfo);
     return outputName;
 }
