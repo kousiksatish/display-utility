@@ -98,6 +98,8 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
 {
     int height = 0;
     int width = 0;
+    int offsetX = 0;
+    int offsetY = 0;
     std::unique_ptr<OutputResolution> currentResolution = nullptr;
     if (resources_.Refresh(display_, root_) == false)
     {
@@ -116,16 +118,20 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
         {
         case RR_Rotate_90:
         case RR_Rotate_270:
+            offsetX = crtc->y;
+            offsetY = crtc->x;
             width = crtc->height;
             height = crtc->width;
             break;
         case RR_Rotate_0:
         case RR_Rotate_180:
         default:
+            offsetX = crtc->x;
+            offsetY = crtc->y;
             width = crtc->width;
             height = crtc->height;
         }
-        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode));
+        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode, offsetX, offsetY));
         XRRFreeCrtcInfo(crtc);
     }
     XRRFreeOutputInfo(outputInfo);
@@ -153,6 +159,7 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
         XRRFreeCrtcInfo(crtc);
         for (int i = 0; i < outputInfo->nmode; i++)
         {
+            std::cout<<outputInfo->mm_height<<"x"<<outputInfo->mm_width;
             OutputResolution *resolution = resources_.GetResolutionUsingModeId(outputInfo->modes[i], crtc->rotation);
             if (resolution != nullptr && !(*resolution < *minimumDesktopResolution))
             {
