@@ -6,6 +6,10 @@ import lockSystem from 'lock-system';
  */
 // tslint:disable-next-line: no-unsafe-any
 export const displayUtility: INativeDisplayUtility = bindings('display-utility');
+// tslint:disable-next-line: no-any
+const addon: any = bindings('screen-capture-utility');
+// tslint:disable-next-line: no-unsafe-any
+export const screenCaptureUtility: IScreenCaptureUtility = new addon.ScreenCaptureUtility();
 
 export const lockUtility: ILockUtility = {
     lockScreen: lockSystem
@@ -29,4 +33,8 @@ interface INativeDisplayUtility {
 
 interface ILockUtility {
     lockScreen(): void;
+}
+
+interface IScreenCaptureUtility {
+    getNextFrame(): ArrayBuffer;
 }
