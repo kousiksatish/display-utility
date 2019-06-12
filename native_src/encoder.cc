@@ -3,7 +3,7 @@
 
 namespace remoting
 {
-    Encoder::Encoder() 
+    void Encoder::Init()
     {
         _screenCapturer = new ScreenCapturer();
         _screenCapturer->Init();
@@ -146,7 +146,7 @@ namespace remoting
         return h;
     }
 
-    Encoder::~Encoder()
+    void Encoder::CleanUp()
     {
         delete[] _rgbData;
         sws_freeContext(_swsConverter);

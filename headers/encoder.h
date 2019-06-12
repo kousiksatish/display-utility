@@ -13,18 +13,12 @@ extern "C"
 
 namespace remoting
 {
-    struct frame
-    {
-        int i_frame_size;
-        uint8_t* p_payload;  
-    };
-
     class Encoder 
     {
         public:
-            Encoder();
+            void Init();
             uint8_t* GetNextFrame(int* frameSize);
-            ~Encoder();
+            void CleanUp();
         private:
             ScreenCapturer* _screenCapturer;
             x264_t* _x264Encoder;
