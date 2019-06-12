@@ -118,20 +118,16 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
         {
         case RR_Rotate_90:
         case RR_Rotate_270:
-            offsetX = crtc->y;
-            offsetY = crtc->x;
             width = crtc->height;
             height = crtc->width;
             break;
         case RR_Rotate_0:
         case RR_Rotate_180:
         default:
-            offsetX = crtc->x;
-            offsetY = crtc->y;
             width = crtc->width;
             height = crtc->height;
         }
-        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode, offsetX, offsetY));
+        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode));
         XRRFreeCrtcInfo(crtc);
     }
     XRRFreeOutputInfo(outputInfo);
