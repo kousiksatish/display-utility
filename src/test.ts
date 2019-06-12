@@ -14,11 +14,13 @@ console.log(displayUtility.getPrimaryRROutput());
 // });
 
 async function testScreenCapturer(): Promise<void> {
+    screenCaptureUtility.init();
     let numberOfFrames: number = 10;
     while (numberOfFrames !== 0) {
         await writeToFile(screenCaptureUtility.getNextFrame());
         numberOfFrames = numberOfFrames - 1;
     }
+    screenCaptureUtility.cleanUp();
 }
 
 async function writeToFile(input: ArrayBuffer): Promise<void> {
