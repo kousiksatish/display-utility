@@ -19,13 +19,25 @@ namespace remoting
 
         // Initialise x264 encoder and swscale converter
         _x264Encoder = OpenEncoder(width, height);
-        _swsConverter = InitializeConverter(width, height);
+        InitializeConverter(width, height);
 
         // RGB input information
         _rgbData = _screenCapturer->GetDataPointer();
+        _rgbPlanes[0] = _rgbData;
+        _rgbPlanes[1] = NULL;
+        _rgbPlanes[2] = NULL;
+        _rgbStride[0] = 4 * width;
+        _rgbStride[1] = 0;
+        _rgbStride[2] = 0;
 
         // YUV output information
         _yuvData = new uint8_t[3 * width * height / 2];
+        _yuvPlanes[0] = _yuvData;
+        _yuvPlanes[1] = _yuvData + width*height;
+        _yuvPlanes[2] = _yuvData + width*height + width*height / 4;
+        _yuvStride[0] = width;
+        _yuvStride[1] = width/2;
+        _yuvStride[2] = width/2;
     }
     
     void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
@@ -72,12 +84,11 @@ namespace remoting
     }
 
 
-    SwsContext* Encoder::InitializeConverter(int W, int H)
+    void Encoder::InitializeConverter(int W, int H)
     {
         // Initialise swscale converter
-        struct SwsContext *sws;
-        sws = sws_getContext(W, H, AV_PIX_FMT_BGRA, W, H, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
-        if (sws == NULL)
+        _swsConverter = sws_getContext(W, H, AV_PIX_FMT_BGRA, W, H, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
+        if (_swsConverter == NULL)
         {
             throw("could not create scaling context.");
         }
@@ -85,8 +96,6 @@ namespace remoting
         {
             std::cout << "created scaling context succeeded." << std::endl;
         }
-
-        return sws;
     }
 
     uint8_t* Encoder::GetNextFrame(int* frame_size)
@@ -94,24 +103,18 @@ namespace remoting
         int W = _width;
         int H = _height;
         _screenCapturer->CaptureScreen();
-        // uint8_t* rgb_planes[3] = {_rgbData, NULL, NULL};
-        // int rgb_stride[3] = {4 * W, 0, 0};
+        
+        int returnValue = sws_scale(_swsConverter, _rgbPlanes, _rgbStride, 0, H, _yuvPlanes, _yuvStride);
+        if (returnValue == H)
+        {
+            std::cout << "Converted the color space of the image." << std::endl;
+        }
+        else
+        {
+            throw("Failed to convert the color space of the image.");
+        }
 
-        // YUV output information
-        // uint8_t* yuv_planes[3] = {yuv_data, yuv_data + W*H, yuv_data + W*H + W*H / 4};
-        // int yuv_stride[3] = {W, W/2, W/2};
-
-        // int returnValue = sws_scale(_swsConverter, rgb_planes, rgb_stride, 0, H, yuv_planes, yuv_stride);
-        // if (returnValue == H)
-        // {
-        //     std::cout << "Converted the color space of the image." << std::endl;
-        // }
-        // else
-        // {
-        //     throw("Failed to convert the color space of the image.");
-        // }
-
-        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
+        // Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
         
         int luma_size = W * H;
         int chroma_size = luma_size/4;

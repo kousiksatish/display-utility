@@ -1,13 +1,15 @@
 #ifndef REMOTING_HOST_ENCODER_H_
 #define REMOTING_HOST_ENCODER_H_
 
-#include <stdint.h>
-#include <X11/Xutil.h>
+
 extern "C"
 {
+#include <stdint.h>
+#include <X11/Xutil.h>
 #include <x264.h>
-#include <libswscale/swscale.h>
-#include <libavutil/pixfmt.h>
+#include "libswscale/swscale.h"
+#include "libavutil/frame.h"
+#include "libavutil/pixfmt.h"
 }
 #include "screen_capturer.h"
 
@@ -24,7 +26,11 @@ namespace remoting
             x264_t* _x264Encoder;
             SwsContext* _swsConverter;
             uint8_t* _rgbData;
+            uint8_t* _rgbPlanes[3];
+            int _rgbStride[3];
             uint8_t* _yuvData;
+            uint8_t* _yuvPlanes[3];
+            int _yuvStride[3];
             x264_picture_t _inputPic;
             x264_picture_t _outputPic;
             x264_nal_t* _nal;
@@ -32,7 +38,7 @@ namespace remoting
             int _width;
             int _height;
             int64_t _i_frame_counter;
-            SwsContext* InitializeConverter(int width, int height);
+            void InitializeConverter(int width, int height);
             x264_t* OpenEncoder(int width, int height);
     };
 
