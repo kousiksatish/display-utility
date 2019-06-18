@@ -20,7 +20,6 @@ async function testScreenCapturer(): Promise<void> {
         await writeToFile(screenCaptureUtility.getNextFrame());
         numberOfFrames = numberOfFrames - 1;
     }
-    screenCaptureUtility.cleanUp();
 }
 
 async function writeToFile(input: ArrayBuffer): Promise<void> {
