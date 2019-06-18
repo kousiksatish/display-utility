@@ -2,6 +2,7 @@
 #define REMOTING_HOST_SCREEN_CAPTURER_H_
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <stdint.h>
 
 namespace remoting
@@ -19,7 +20,7 @@ namespace remoting
             Display* _display;
             Window _window;
             XWindowAttributes _attributes;
-            uint8_t* _data;
+            XImage* _xImage;
     };
 }
 

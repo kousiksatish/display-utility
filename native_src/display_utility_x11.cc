@@ -98,8 +98,6 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
 {
     int height = 0;
     int width = 0;
-    int offsetX = 0;
-    int offsetY = 0;
     std::unique_ptr<OutputResolution> currentResolution = nullptr;
     if (resources_.Refresh(display_, root_) == false)
     {

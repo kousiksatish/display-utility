@@ -7,9 +7,7 @@ Napi::Object ScreenCaptureUtility::Init(Napi::Env env, Napi::Object exports)
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "ScreenCaptureUtility", {
         InstanceMethod("init", &ScreenCaptureUtility::Init),
-        InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame),
-        InstanceMethod("cleanUp", &ScreenCaptureUtility::CleanUp),
-        
+        InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame)        
     });
 
     constructor = Napi::Persistent(func);
@@ -36,8 +34,8 @@ Napi::Value ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
     return Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size);
 }
 
-void ScreenCaptureUtility::CleanUp(const Napi::CallbackInfo& info) {
-    this->_encoder->CleanUp();
+ScreenCaptureUtility::~ScreenCaptureUtility() {
+    delete this->_encoder;
 }
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports) {

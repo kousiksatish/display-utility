@@ -23,6 +23,9 @@ namespace remoting
 
         // RGB input information
         _rgbData = _screenCapturer->GetDataPointer();
+
+        // YUV output information
+        _yuvData = new uint8_t[3 * width * height / 2];
     }
     
     void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
@@ -91,14 +94,12 @@ namespace remoting
         int W = _width;
         int H = _height;
         _screenCapturer->CaptureScreen();
-        _rgbData = _screenCapturer->GetDataPointer();
-        uint8_t* rgb_planes[3] = {_rgbData, NULL, NULL};
-        int rgb_stride[3] = {4 * W, 0, 0};
+        // uint8_t* rgb_planes[3] = {_rgbData, NULL, NULL};
+        // int rgb_stride[3] = {4 * W, 0, 0};
 
         // YUV output information
-        uint8_t* yuv_data = new uint8_t[3 * W * H / 2];
-        uint8_t* yuv_planes[3] = {yuv_data, yuv_data + W*H, yuv_data + W*H + W*H / 4};
-        int yuv_stride[3] = {W, W/2, W/2};
+        // uint8_t* yuv_planes[3] = {yuv_data, yuv_data + W*H, yuv_data + W*H + W*H / 4};
+        // int yuv_stride[3] = {W, W/2, W/2};
 
         // int returnValue = sws_scale(_swsConverter, rgb_planes, rgb_stride, 0, H, yuv_planes, yuv_stride);
         // if (returnValue == H)
@@ -110,23 +111,18 @@ namespace remoting
         //     throw("Failed to convert the color space of the image.");
         // }
 
-        Bitmap2Yuv420p_calc2(yuv_data, _rgbData, W, H);
+        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
         
         int luma_size = W * H;
         int chroma_size = luma_size/4;
 
-        _inputPic.img.plane[0] = yuv_data;
-        _inputPic.img.plane[1] = yuv_data + luma_size;
-        _inputPic.img.plane[2] = yuv_data + luma_size + chroma_size;
+        _inputPic.img.plane[0] = _yuvData;
+        _inputPic.img.plane[1] = _yuvData + luma_size;
+        _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
         _inputPic.i_pts = _i_frame_counter;
         _i_frame_counter++;
 
-        x264_picture_t outputPic;
-
-        x264_nal_t* nal;
-        int i_nal;
-
-        int i_frame_size = x264_encoder_encode(_x264Encoder, &nal, &i_nal, &_inputPic, &outputPic);
+        int i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
         std::cout<<i_frame_size;
 
         *frame_size = i_frame_size;
@@ -135,10 +131,7 @@ namespace remoting
             throw ("No NAL is produced out of encoder.");
         }
 
-        delete[] yuv_data;
-        // x264_picture_clean(&outputPic);
-        
-        return nal->p_payload;
+        return _nal->p_payload;
     }
 
     x264_t* Encoder::OpenEncoder(int width, int height) 
@@ -192,10 +185,15 @@ namespace remoting
         return h;
     }
 
-    void Encoder::CleanUp()
+    Encoder::~Encoder()
     {
-        delete[] _rgbData;
-        sws_freeContext(_swsConverter);
+        delete this->_screenCapturer;
         x264_encoder_close(_x264Encoder);
+        delete[] _rgbData;       
+        delete[] _yuvData;
+        x264_picture_clean(&_inputPic);
+        x264_picture_clean(&_outputPic);
+
+        // sws_freeContext(_swsConverter);
     }
 }

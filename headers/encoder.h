@@ -18,13 +18,17 @@ namespace remoting
         public:
             void Init();
             uint8_t* GetNextFrame(int* frameSize);
-            void CleanUp();
+            ~Encoder();
         private:
             ScreenCapturer* _screenCapturer;
             x264_t* _x264Encoder;
             SwsContext* _swsConverter;
             uint8_t* _rgbData;
+            uint8_t* _yuvData;
             x264_picture_t _inputPic;
+            x264_picture_t _outputPic;
+            x264_nal_t* _nal;
+            int _noOfNal;
             int _width;
             int _height;
             int64_t _i_frame_counter;

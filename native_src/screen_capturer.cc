@@ -10,15 +10,17 @@ namespace remoting
 
     void ScreenCapturer::InitializeMonitorProperties() {
         XGetWindowAttributes(_display, _window, &_attributes);
+        // To allocate memory
+        _xImage = XGetImage(_display, _window, 0, 0, _attributes.width, _attributes.height, AllPlanes, ZPixmap);
     }
 
     uint8_t* ScreenCapturer::GetDataPointer() {
-        return _data;
+        return reinterpret_cast<uint8_t*>(_xImage->data);
     }
 
     void ScreenCapturer::CaptureScreen() {
-        XImage* x_image = XGetImage(_display, _window, 0, 0, _attributes.width, _attributes.height, AllPlanes, ZPixmap);
-        _data = reinterpret_cast<uint8_t*>(x_image->data);
+        // Reuse the same memory
+        XGetSubImage(_display, _window, 0, 0, _attributes.width, _attributes.height, AllPlanes, ZPixmap, _xImage, 0, 0);
     }
 
     int ScreenCapturer::GetWidth() {
@@ -30,6 +32,7 @@ namespace remoting
     }
 
     ScreenCapturer::~ScreenCapturer() {
+        XDestroyImage(_xImage);
         XCloseDisplay(_display);
     }
 }
