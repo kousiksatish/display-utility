@@ -19,7 +19,8 @@
     "transpile": "tsc --build tsconfig.json",
     "lint": "tslint --project tsconfig.json --config tslint.json --fix",
     "prepare": "npm run transpile",
-    "test": "npm run lint && npm run transpile && node release/test.js"
+    "test": "npm run lint && npm run transpile && node release/test.js",
+    "build:dev": "node-gyp rebuild --debug"
   },
   "husky": {
     "hooks": {
