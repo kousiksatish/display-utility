@@ -15,7 +15,8 @@
         "native_src/display_utility_x11.cc",
         "native_src/output_resolution.cc",
         "native_src/screen_resources.cc",
-        "native_src/x11_util.cc"],
+        "native_src/x11_util.cc",
+        "native_src/output_resolution_with_offset.cc"],
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     },
     { 
