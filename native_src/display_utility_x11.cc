@@ -94,11 +94,13 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
     return false;
 }
 
-std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
+std::unique_ptr<OutputResolutionWithOffset> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
 {
     int height = 0;
     int width = 0;
-    std::unique_ptr<OutputResolution> currentResolution = nullptr;
+    int offsetX = 0;
+    int offsetY = 0;
+    std::unique_ptr<OutputResolutionWithOffset> currentResolution = nullptr;
     if (resources_.Refresh(display_, root_) == false)
     {
         return currentResolution;
@@ -118,14 +120,18 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
         case RR_Rotate_270:
             width = crtc->height;
             height = crtc->width;
+            offsetX = crtc->y;
+            offsetY = crtc->x;
             break;
         case RR_Rotate_0:
         case RR_Rotate_180:
         default:
             width = crtc->width;
             height = crtc->height;
+            offsetX = crtc->x;
+            offsetY = crtc->y;
         }
-        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode));
+        currentResolution = std::unique_ptr<OutputResolutionWithOffset>(new OutputResolutionWithOffset(width, height, crtc->mode, offsetX, offsetY));
         XRRFreeCrtcInfo(crtc);
     }
     XRRFreeOutputInfo(outputInfo);

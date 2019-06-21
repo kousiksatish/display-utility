@@ -14,7 +14,7 @@ public:
 
     // DesktopResizer interface
     bool TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs);
-    std::unique_ptr<OutputResolution> GetCurrentResolution(RROutput rROutput);
+    std::unique_ptr<OutputResolutionWithOffset> GetCurrentResolution(RROutput rROutput);
     std::set<OutputResolution> GetResolutions(RROutput rROutput);
     std::string GetOutputName(RROutput rROutput);
     RROutput GetPrimaryRROutput();

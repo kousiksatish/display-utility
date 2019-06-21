@@ -9,6 +9,7 @@ extern "C"
 #include <X11/extensions/Xrandr.h>
 }
 #include "output_resolution.h"
+#include "output_resolution_with_offset.h"
 
 namespace remoting
 {

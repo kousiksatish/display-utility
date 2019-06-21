@@ -72,10 +72,11 @@ Napi::Object GetCurrentResolution(const Napi::CallbackInfo &info)
 
     unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(rROutput);
+    std::unique_ptr<OutputResolutionWithOffset> resolution = desktopInfo->GetCurrentResolution(rROutput);
     if (resolution != nullptr)
     {
         std::cout << "current Resolution : " << resolution->width() << "x" << resolution->height() << std::endl;
+        std::cout << "current offset : " << resolution->offsetX() << "x" << resolution->offsetY() << std::endl;
         currentResolution = Napi::Object::New(env);
         currentResolution.Set(Napi::String::New(env, "width"), Napi::Number::New(env, resolution->width()));
         currentResolution.Set(Napi::String::New(env, "height"), Napi::Number::New(env, resolution->height()));
