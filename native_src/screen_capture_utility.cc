@@ -42,12 +42,15 @@ void ScreenCaptureUtility::Init(const Napi::CallbackInfo& info) {
     }
 }
 
-Napi::Value ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
-    int frame_size;
-    uint8_t* nextFrame;
+void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
     try
     {
+        Napi::Env env = info.Env();
+        Napi::Function cb = info[0].As<Napi::Function>();
+        int frame_size;
+        uint8_t* nextFrame;
         nextFrame = this->_encoder->GetNextFrame(&frame_size);
+        cb.Call(env.Global(), { Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size) });
     }
     catch(const char* message)
     {
@@ -57,8 +60,6 @@ Napi::Value ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
     {
         Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
     }
-    
-    return Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size);   
 }
 
 ScreenCaptureUtility::~ScreenCaptureUtility() {

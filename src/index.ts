@@ -37,5 +37,5 @@ interface ILockUtility {
 
 interface IScreenCaptureUtility {
     init(): void;
-    getNextFrame(): ArrayBuffer;
+    getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void;
 }

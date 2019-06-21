@@ -15,7 +15,7 @@ namespace remoting
         private:
             static Napi::FunctionReference constructor;
             
-            Napi::Value GetNextFrame(const Napi::CallbackInfo& info);
+            void GetNextFrame(const Napi::CallbackInfo& info);
             void Init(const Napi::CallbackInfo& info);
 
             Encoder* _encoder;
