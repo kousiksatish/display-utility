@@ -1,5 +1,4 @@
 import fs from 'fs';
-import * as path from 'path';
 import { displayUtility, lockUtility, screenCaptureUtility } from './index';
 
 // tslint:disable-next-line:no-console
@@ -14,11 +13,16 @@ console.log(displayUtility.getPrimaryRROutput());
 // });
 
 async function testScreenCapturer(): Promise<void> {
-    screenCaptureUtility.init();
-    let numberOfFrames: number = 10;
-    while (numberOfFrames !== 0) {
-        await writeToFile(screenCaptureUtility.getNextFrame());
-        numberOfFrames = numberOfFrames - 1;
+    try {
+        screenCaptureUtility.init();
+        let numberOfFrames: number = 10;
+        while (numberOfFrames !== 0) {
+            await writeToFile(screenCaptureUtility.getNextFrame());
+            numberOfFrames = numberOfFrames - 1;
+        }
+    } catch (err) {
+        // tslint:disable-next-line: no-console
+        console.log(err);
     }
 }
 

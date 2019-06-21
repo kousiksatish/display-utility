@@ -18,6 +18,7 @@ namespace remoting
     class Encoder 
     {
         public:
+            Encoder();
             void Init();
             uint8_t* GetNextFrame(int* frameSize);
             ~Encoder();
@@ -31,6 +32,7 @@ namespace remoting
             uint8_t* _yuvData;
             uint8_t* _yuvPlanes[3];
             int _yuvStride[3];
+            bool _isInitialised;
             x264_picture_t _inputPic;
             x264_picture_t _outputPic;
             x264_nal_t* _nal;
