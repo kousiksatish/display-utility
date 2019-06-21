@@ -2,7 +2,7 @@
 
 namespace remoting
 {
-    void ScreenCapturer::Init()
+    ScreenCapturer::ScreenCapturer()
     {
         _display = XOpenDisplay(NULL);
         _window = DefaultRootWindow(_display);

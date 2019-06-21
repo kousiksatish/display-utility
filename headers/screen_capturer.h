@@ -9,7 +9,7 @@ namespace remoting
 {
     class ScreenCapturer {
         public:
-            void Init();
+            ScreenCapturer();
             void InitializeMonitorProperties();
             uint8_t* GetDataPointer();
             void CaptureScreen();

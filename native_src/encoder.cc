@@ -6,7 +6,6 @@ namespace remoting
     void Encoder::Init()
     {
         _screenCapturer = new ScreenCapturer();
-        _screenCapturer->Init();
         _screenCapturer->InitializeMonitorProperties();
 
         _i_frame_counter = 0;
