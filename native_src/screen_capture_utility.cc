@@ -1,4 +1,5 @@
 #include "../headers/screen_capture_utility.h"
+#include <iostream>
 using namespace remoting;
 Napi::FunctionReference ScreenCaptureUtility::constructor;
 
@@ -25,13 +26,39 @@ ScreenCaptureUtility::ScreenCaptureUtility(const Napi::CallbackInfo& info) : Nap
 }
 
 void ScreenCaptureUtility::Init(const Napi::CallbackInfo& info) {
-    this->_encoder->Init();
+    try
+    {
+        this->_encoder->Init();
+    }
+    catch(const char* message)
+    {
+        Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
+        return;
+    }
+    catch(std::string message)
+    {
+        Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 Napi::Value ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
     int frame_size;
-    uint8_t* nextFrame = this->_encoder->GetNextFrame(&frame_size);
-    return Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size);
+    uint8_t* nextFrame;
+    try
+    {
+        nextFrame = this->_encoder->GetNextFrame(&frame_size);
+    }
+    catch(const char* message)
+    {
+        Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
+    }
+    catch(std::string message)
+    {
+        Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
+    }
+    
+    return Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size);   
 }
 
 ScreenCaptureUtility::~ScreenCaptureUtility() {

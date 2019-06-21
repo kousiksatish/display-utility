@@ -3,12 +3,21 @@
 
 namespace remoting
 {
-    void Encoder::Init()
+    Encoder::Encoder()
     {
-        _screenCapturer = new ScreenCapturer();
-        _screenCapturer->InitializeMonitorProperties();
-
-        _i_frame_counter = 0;
+        _isInitialised = false;
+    }
+    void Encoder::Init()
+    {   
+        try
+        {
+            _screenCapturer = new ScreenCapturer();
+            _screenCapturer->InitializeMonitorProperties();
+        }
+        catch(std::string msg)
+        {
+            throw "ERROR: x264 Encoder initialisation failed." + msg;
+        }
 
         int width = _screenCapturer->GetWidth();
         int height = _screenCapturer->GetHeight();
@@ -16,9 +25,7 @@ namespace remoting
         _width = width;
         _height = height;
 
-        // Initialise x264 encoder and swscale converter
-        _x264Encoder = OpenEncoder(width, height);
-        InitializeConverter(width, height);
+        _i_frame_counter = 0;
 
         // RGB input information
         _rgbData = _screenCapturer->GetDataPointer();
@@ -37,8 +44,21 @@ namespace remoting
         _yuvStride[0] = width;
         _yuvStride[1] = width/2;
         _yuvStride[2] = width/2;
+
+        try
+        {
+            // Initialise x264 encoder
+            _x264Encoder = OpenEncoder(width, height);
+        }
+        catch(const char* msg)
+        {
+            throw "ERROR: x264 Encoder initialisation failed. " + std::string(msg);
+        }
+        // InitializeConverter(width, height);
+
+        _isInitialised = true;
     }
-    
+
     void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
     {
         size_t image_size = width * height;
@@ -89,7 +109,7 @@ namespace remoting
         _swsConverter = sws_getContext(W, H, AV_PIX_FMT_BGRA, W, H, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (_swsConverter == NULL)
         {
-            throw("could not create scaling context.");
+            throw "Could not create scaling context.";
         }
         else
         {
@@ -99,21 +119,42 @@ namespace remoting
 
     uint8_t* Encoder::GetNextFrame(int* frame_size)
     {
+        if (!_isInitialised)
+        {
+            throw "ERROR: ScreenCaptureUtility not initialised before use.";
+        }
+        
         int W = _width;
         int H = _height;
-        _screenCapturer->CaptureScreen();
-        
-        int returnValue = sws_scale(_swsConverter, _rgbPlanes, _rgbStride, 0, H, _yuvPlanes, _yuvStride);
-        if (returnValue == H)
+
+        try
         {
-            std::cout << "Converted the color space of the image." << std::endl;
+            _screenCapturer->CaptureScreen();    
         }
-        else
+        catch(const char* msg)
         {
-            throw("Failed to convert the color space of the image.");
+            throw "ERROR: Screen capture of next frame failed. " + std::string(msg);
+        }
+        
+        // int returnValue = sws_scale(_swsConverter, _rgbPlanes, _rgbStride, 0, H, _yuvPlanes, _yuvStride);
+        // if (returnValue == H)
+        // {
+        //     std::cout << "Converted the color space of the image." << std::endl;
+        // }
+        // else
+        // {
+        //     throw("Failed to convert the color space of the image.");
+        // }
+
+        try
+        {
+            Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
+        }
+        catch(const char* msg)
+        {
+            throw "ERROR: RGB to YUV conversion failed. " + std::string(msg);
         }
 
-        // Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
         
         int luma_size = W * H;
         int chroma_size = luma_size/4;
@@ -123,14 +164,21 @@ namespace remoting
         _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
         _inputPic.i_pts = _i_frame_counter;
         _i_frame_counter++;
-
-        int i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
-        std::cout<<i_frame_size;
-
-        *frame_size = i_frame_size;
-        if (i_frame_size <= 0)
+    
+        int i_frame_size = 0;
+        try
         {
-            throw ("No NAL is produced out of encoder.");
+            i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
+            std::cout<<i_frame_size;
+            *frame_size = i_frame_size;
+            if (i_frame_size <= 0)
+            {
+                throw "No NAL is produced out of encoder.";
+            }
+        }
+        catch(const char* msg)
+        {
+            throw "ERROR : Encoding failed. " + std::string(msg);
         }
 
         return _nal->p_payload;
@@ -148,7 +196,7 @@ namespace remoting
         }
         else
         {
-            throw("Failed to apply default preset.");
+            throw "Failed to apply default preset.";
         }
 
         /* Configure non-default params */
@@ -169,7 +217,7 @@ namespace remoting
         }
         else
         {
-            throw("Failed to apply profile.");
+            throw "Failed to apply profile.";
         }
 
         returnValue = x264_picture_alloc(&_inputPic, x264Params.i_csp, x264Params.i_width, x264Params.i_height);
@@ -179,7 +227,7 @@ namespace remoting
         }
         else
         {
-            throw("x264_picture_alloc Failed.");
+            throw "x264_picture_alloc Failed.";
         }
 
         h = x264_encoder_open(&x264Params);
@@ -191,7 +239,6 @@ namespace remoting
     {
         delete this->_screenCapturer;
         x264_encoder_close(_x264Encoder);
-        delete[] _rgbData;       
         delete[] _yuvData;
         x264_picture_clean(&_inputPic);
         x264_picture_clean(&_outputPic);
