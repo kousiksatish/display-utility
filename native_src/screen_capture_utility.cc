@@ -28,7 +28,15 @@ ScreenCaptureUtility::ScreenCaptureUtility(const Napi::CallbackInfo& info) : Nap
 void ScreenCaptureUtility::Init(const Napi::CallbackInfo& info) {
     try
     {
-        this->_encoder->Init();
+        if (info.Length() >= 1 && info[0].IsNumber())
+        {
+            unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
+            this->_encoder->Init(rROutput);
+        }
+        else
+        {
+            this->_encoder->Init();
+        }
     }
     catch(const char* message)
     {

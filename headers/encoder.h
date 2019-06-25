@@ -19,7 +19,7 @@ namespace remoting
     {
         public:
             Encoder();
-            void Init();
+            void Init(RROutput rROutput = 0);
             uint8_t* GetNextFrame(int* frameSize);
             ~Encoder();
         private:

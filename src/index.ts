@@ -36,6 +36,6 @@ interface ILockUtility {
 }
 
 interface IScreenCaptureUtility {
-    init(): void;
+    init(rROutput?: number): void;
     getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void;
 }

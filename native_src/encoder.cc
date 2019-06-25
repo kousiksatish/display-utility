@@ -7,12 +7,27 @@ namespace remoting
     {
         _isInitialised = false;
     }
-    void Encoder::Init()
+    void Encoder::Init(RROutput rROutput)
     {   
+        if (_isInitialised) {
+            std::cout<<"Deleting stuff for reinitialising..";
+            delete this->_screenCapturer;
+            // x264_picture_clean(&_inputPic);
+            // x264_picture_clean(&_outputPic);
+            x264_encoder_close(_x264Encoder);
+            delete[] _yuvData;
+        }
         try
         {
             _screenCapturer = new ScreenCapturer();
-            _screenCapturer->InitializeMonitorProperties();
+            if (rROutput != 0)
+            {
+                _screenCapturer->InitializeMonitorProperties(rROutput);
+            }
+            else
+            {
+                _screenCapturer->InitializeMonitorProperties();
+            }
         }
         catch(std::string msg)
         {

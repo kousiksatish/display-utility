@@ -3,6 +3,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include "display_utility_x11.h"
 #include <stdint.h>
 
 namespace remoting
@@ -11,6 +12,7 @@ namespace remoting
         public:
             ScreenCapturer();
             void InitializeMonitorProperties();
+            void InitializeMonitorProperties(RROutput rROutput);
             uint8_t* GetDataPointer();
             void CaptureScreen();
             int GetWidth();
@@ -19,7 +21,10 @@ namespace remoting
         private: 
             Display* _display;
             Window _window;
-            XWindowAttributes _attributes;
+            int _offsetX;
+            int _offsetY;
+            int _width;
+            int _height;
             XImage* _xImage;
     };
 }

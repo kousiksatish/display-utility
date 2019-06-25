@@ -9,9 +9,29 @@ namespace remoting
     }
 
     void ScreenCapturer::InitializeMonitorProperties() {
-        XGetWindowAttributes(_display, _window, &_attributes);
+        XWindowAttributes attributes;
+        XGetWindowAttributes(_display, _window, &attributes);
+        _offsetX = 0;
+        _offsetY = 0;
+        _width = attributes.width;
+        _height = attributes.height;
         // To allocate memory
-        _xImage = XGetImage(_display, _window, 0, 0, _attributes.width, _attributes.height, AllPlanes, ZPixmap);
+        _xImage = XGetImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap);
+    }
+
+    void ScreenCapturer::InitializeMonitorProperties(RROutput rROutput) {
+        std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+        std::unique_ptr<OutputResolutionWithOffset> resolution = desktopInfo->GetCurrentResolution(rROutput);
+        if (resolution != nullptr) {
+            _offsetX = resolution->offsetX();
+            _offsetY = resolution->offsetY();
+            _width = resolution->width();
+            _height = resolution->height();
+            // To allocate memory
+            _xImage = XGetImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap);
+        } else {
+            throw "Error in getting resolution and offset";
+        }
     }
 
     uint8_t* ScreenCapturer::GetDataPointer() {
@@ -20,15 +40,15 @@ namespace remoting
 
     void ScreenCapturer::CaptureScreen() {
         // Reuse the same memory
-        XGetSubImage(_display, _window, 0, 0, _attributes.width, _attributes.height, AllPlanes, ZPixmap, _xImage, 0, 0);
+        XGetSubImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap, _xImage, 0, 0);
     }
 
     int ScreenCapturer::GetWidth() {
-        return _attributes.width;
+        return _width;
     }
 
     int ScreenCapturer::GetHeight() {
-        return _attributes.height;
+        return _height;
     }
 
     ScreenCapturer::~ScreenCapturer() {
