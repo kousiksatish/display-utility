@@ -73,9 +73,3 @@ void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo& info) {
 ScreenCaptureUtility::~ScreenCaptureUtility() {
     delete this->_encoder;
 }
-
-Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
-    return ScreenCaptureUtility::Init(env, exports);
-}
-    
-NODE_API_MODULE(addon, InitAll);

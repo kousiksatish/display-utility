@@ -3,11 +3,16 @@ import lockSystem from 'lock-system';
 
 /**
  * DisplayUtility will retrieve the information about the desktop display.
+ * ScreenCaptureUtility will provide functions to capture screen and encode it.
+ * Both these utilities are exposed by single .node file display-utility.node
  */
-// tslint:disable-next-line: no-unsafe-any
-export const displayUtility: INativeDisplayUtility = bindings('display-utility');
 // tslint:disable-next-line: no-any
-const addon: any = bindings('screen-capture-utility');
+const addon: any = bindings('display-utility');
+
+// tslint:disable-next-line: no-unsafe-any
+export const displayUtility: INativeDisplayUtility = addon.DisplayUtility;
+
+// Creating and exporting persistent object for screen capture utility
 // tslint:disable-next-line: no-unsafe-any
 export const screenCaptureUtility: IScreenCaptureUtility = new addon.ScreenCaptureUtility();
 
@@ -29,6 +34,7 @@ interface INativeDisplayUtility {
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
     getPrimaryRROutput(): number;
+    Name(): string;
 }
 
 interface ILockUtility {

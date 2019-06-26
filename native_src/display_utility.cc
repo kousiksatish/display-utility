@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <iostream>
 #include "../headers/display_utility_x11.h"
+#include "../headers/screen_capture_utility.h"
 using namespace remoting;
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
@@ -217,15 +218,20 @@ Napi::Number GetPrimaryRROutput(const Napi::CallbackInfo &info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
-    exports.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
-    exports.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
-    exports.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
-    exports.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
-    exports.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
-    exports.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
-    exports.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
-    return exports;
+    Napi::Object displayUtility = Napi::Object::New(env);
+
+    displayUtility.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
+    displayUtility.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
+    displayUtility.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
+    displayUtility.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
+    displayUtility.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
+    displayUtility.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
+    displayUtility.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
+    displayUtility.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
+
+    exports.Set("DisplayUtility", displayUtility);
+    
+    return ScreenCaptureUtility::Init(env, exports);
 }
 
 NODE_API_MODULE(desktop_info, Init);
