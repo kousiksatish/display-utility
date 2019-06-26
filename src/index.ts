@@ -34,7 +34,6 @@ interface INativeDisplayUtility {
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
     getPrimaryRROutput(): number;
-    Name(): string;
 }
 
 interface ILockUtility {
