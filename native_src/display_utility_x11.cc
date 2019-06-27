@@ -131,7 +131,7 @@ std::unique_ptr<OutputResolutionWithOffset> DisplayUtilityX11::GetCurrentResolut
             offsetX = crtc->x;
             offsetY = crtc->y;
         }
-        currentResolution = std::unique_ptr<OutputResolutionWithOffset>(new OutputResolutionWithOffset(width, height, crtc->mode, offsetX, offsetY));
+        currentResolution = std::unique_ptr<OutputResolutionWithOffset>(new OutputResolutionWithOffset(width, height, crtc->mode, offsetX, offsetY, rROutput));
         XRRFreeCrtcInfo(crtc);
     }
     XRRFreeOutputInfo(outputInfo);
@@ -172,6 +172,32 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 
     XRRFreeOutputInfo(outputInfo);
     return resolutionsSet;
+}
+
+std::set<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResolutions()
+{
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+
+    std::set<OutputResolutionWithOffset> currentResolutionsSet;
+
+    if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
+
+            for (unsigned int i = 0; i < numberOfOutputs; i += 1)
+            {
+                // Get current resolution with offset for each output
+                std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = this->GetCurrentResolution(connectedOutputs[i]);
+                OutputResolutionWithOffset* ptr = resolutionWithOffset.release();
+                currentResolutionsSet.insert(*ptr);
+                delete ptr;
+            }
+        }
+    }
+    return currentResolutionsSet;
 }
 
 std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)

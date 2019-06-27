@@ -3,11 +3,9 @@
 
 namespace remoting
 {
-OutputResolutionWithOffset::OutputResolutionWithOffset(unsigned int width, unsigned int height, RRMode modeId, int offsetX, int offsetY)
-    : OutputResolution(width, height, modeId), offsetX_(offsetX), offsetY_(offsetY)
+OutputResolutionWithOffset::OutputResolutionWithOffset(unsigned int width, unsigned int height, RRMode modeId, int offsetX, int offsetY, RROutput rrOutput)
+    : OutputResolution(width, height, modeId), offsetX_(offsetX), offsetY_(offsetY), rrOutput_(rrOutput)
 {
-    offsetX_ = offsetX;
-    offsetY_ = offsetY;
     // std::cout << "Constructor Output resolution with offset instance" << std::endl;
 }
 int OutputResolutionWithOffset::offsetX() const
@@ -17,6 +15,10 @@ int OutputResolutionWithOffset::offsetX() const
 int OutputResolutionWithOffset::offsetY() const
 {
     return offsetY_;
+}
+RROutput OutputResolutionWithOffset::rrOutput() const
+{
+    return rrOutput_;
 }
 OutputResolutionWithOffset::~OutputResolutionWithOffset()
 {

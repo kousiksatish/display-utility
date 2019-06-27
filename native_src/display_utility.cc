@@ -244,34 +244,20 @@ Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
     Napi::Array currentResolutionsArray;
 
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    unsigned int numberOfOutputs = 0;
-    RROutput *connectedOutputs = nullptr;
-    // Get all connected outputs
-    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    std::set<OutputResolutionWithOffset> currentResolutions = desktopInfo->GetAllCurrentResolutions();
+    
+    currentResolutionsArray = Napi::Array::New(env);
+    int i = 0;
+    for (auto resolutionWithOffset : currentResolutions)
     {
-        if (connectedOutputs != nullptr)
-        {
-            std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
-            currentResolutionsArray = Napi::Array::New(env);
-            for (unsigned int i = 0; i < numberOfOutputs; i += 1)
-            {
-                // Get current resolution with offset for each output
-                std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = desktopInfo->GetCurrentResolution(connectedOutputs[i]);
-
-                // Create new object with below properties and add to resultant array
-                Napi::Object outputWithResolution = Napi::Object::New(env);
-                outputWithResolution.Set("rrOutput", connectedOutputs[i]);
-                outputWithResolution.Set("offsetX", resolutionWithOffset->offsetX());
-                outputWithResolution.Set("offsetY", resolutionWithOffset->offsetY());
-                outputWithResolution.Set("width", resolutionWithOffset->width());
-                outputWithResolution.Set("height", resolutionWithOffset->height());
-                currentResolutionsArray.Set(i, outputWithResolution);
-
-                resolutionWithOffset = nullptr;
-            }
-            delete[] connectedOutputs;
-        }
-        return currentResolutionsArray;
+            Napi::Object outputWithResolution = Napi::Object::New(env);
+            outputWithResolution.Set("rrOutput", resolutionWithOffset.rrOutput());
+            outputWithResolution.Set("offsetX", resolutionWithOffset.offsetX());
+            outputWithResolution.Set("offsetY", resolutionWithOffset.offsetY());
+            outputWithResolution.Set("width", resolutionWithOffset.width());
+            outputWithResolution.Set("height", resolutionWithOffset.height());
+            currentResolutionsArray.Set(i, outputWithResolution);
+            i++;
     }
     Napi::Error::New(env, "Could not get the number of outputs of the display. Please try again.");
     return currentResolutionsArray;

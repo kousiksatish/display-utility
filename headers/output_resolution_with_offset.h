@@ -15,12 +15,14 @@ class OutputResolutionWithOffset : public OutputResolution
 {
 public:
     ~OutputResolutionWithOffset();
-    OutputResolutionWithOffset(unsigned int width, unsigned int height, RRMode modeId, int offsetX, int offsetY);
+    OutputResolutionWithOffset(unsigned int width, unsigned int height, RRMode modeId, int offsetX, int offsetY, RROutput rrOutput);
     int offsetX() const;
     int offsetY() const;
+    RROutput rrOutput() const;
 private:
     int offsetX_;
     int offsetY_;
+    RROutput rrOutput_;
 };
 } // namespace remoting
 
