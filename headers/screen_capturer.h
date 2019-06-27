@@ -26,6 +26,8 @@ namespace remoting
             int _width;
             int _height;
             XImage* _xImage;
+            std::set<OutputResolutionWithOffset> _currentResolutions;
+            bool _multiMonitor;
     };
 }
 

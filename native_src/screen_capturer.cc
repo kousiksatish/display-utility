@@ -1,4 +1,5 @@
 #include "../headers/screen_capturer.h"
+#include <string.h>
 
 namespace remoting
 {
@@ -6,6 +7,7 @@ namespace remoting
     {
         _display = XOpenDisplay(NULL);
         _window = DefaultRootWindow(_display);
+        _multiMonitor = false;
     }
 
     void ScreenCapturer::InitializeMonitorProperties() {
@@ -15,8 +17,15 @@ namespace remoting
         _offsetY = 0;
         _width = attributes.width;
         _height = attributes.height;
+
+        std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+        _currentResolutions = desktopInfo->GetAllCurrentResolutions();
+
         // To allocate memory
         _xImage = XGetImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap);
+        // Black out the image
+        memset(_xImage->data, 0, _width * _height * _xImage->bits_per_pixel / 8);
+        _multiMonitor = true;
     }
 
     void ScreenCapturer::InitializeMonitorProperties(RROutput rROutput) {
@@ -39,8 +48,14 @@ namespace remoting
     }
 
     void ScreenCapturer::CaptureScreen() {
-        // Reuse the same memory
-        XGetSubImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap, _xImage, 0, 0);
+        // Use XGetDubImage to reuse the same memory
+        if (!_multiMonitor) {
+            XGetSubImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap, _xImage, _width, _height);
+        } else {
+            for (auto res : _currentResolutions) {
+                XGetSubImage(_display, _window, res.offsetX(), res.offsetY(), res.width(), res.height(), AllPlanes, ZPixmap, _xImage, res.offsetX(), res.offsetY());
+            }
+        }
     }
 
     int ScreenCapturer::GetWidth() {
