@@ -28,6 +28,7 @@ export interface IResolution {
 export interface IResolutionWithOffset {
     offsetX: number;
     offsetY: number;
+    rrOutput: number;
 }
 
 interface INativeDisplayUtility {
@@ -40,7 +41,7 @@ interface INativeDisplayUtility {
     reverseBlankScreen(): void;
     getPrimaryRROutput(): number;
     getExtendedMonitorResolution(): IResolution | undefined;
-    getAllCurrentResolutionsWithOffset(): IResolutionWithOffset | undefined;
+    getAllCurrentResolutionsWithOffset(): IResolutionWithOffset[] | undefined;
 }
 
 interface ILockUtility {
