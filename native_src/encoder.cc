@@ -180,7 +180,7 @@ namespace remoting
         try
         {
             i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
-            std::cout<<i_frame_size;
+            // std::cout<<i_frame_size;
             *frame_size = i_frame_size;
             if (i_frame_size <= 0)
             {
