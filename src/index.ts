@@ -34,6 +34,7 @@ interface INativeDisplayUtility {
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
     getPrimaryRROutput(): number;
+    getExtendedMonitorResolution(): IResolution | undefined;
 }
 
 interface ILockUtility {

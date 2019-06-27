@@ -195,4 +195,18 @@ RROutput DisplayUtilityX11::GetPrimaryRROutput()
     return XRRGetOutputPrimary(display_, root_);
 }
 
+std::unique_ptr<OutputResolution> DisplayUtilityX11::GetExtendedMonitorResolution()
+{
+    std::unique_ptr<OutputResolution> extendedResolution = nullptr;
+
+    // Get width and height of the complete window
+    XWindowAttributes attributes;
+    XGetWindowAttributes(display_, root_, &attributes);
+
+    // Mode is set as 0 as it is not applicable
+    extendedResolution = std::unique_ptr<OutputResolution>(new OutputResolution(attributes.width, attributes.height, 0));
+
+    return extendedResolution;
+}
+
 } // namespace remoting

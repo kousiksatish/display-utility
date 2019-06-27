@@ -216,6 +216,27 @@ Napi::Number GetPrimaryRROutput(const Napi::CallbackInfo &info)
     return Napi::Number::New(env, outputIndex);
 }
 
+Napi::Object GetExtendedMonitorResolution(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    Napi::Object extendedResolution;
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetExtendedMonitorResolution();
+    if (resolution != nullptr)
+    {
+        // std::cout << "extended Resolution : " << resolution->width() << "x" << resolution->height() << std::endl;
+        extendedResolution = Napi::Object::New(env);
+        extendedResolution.Set(Napi::String::New(env, "width"), Napi::Number::New(env, resolution->width()));
+        extendedResolution.Set(Napi::String::New(env, "height"), Napi::Number::New(env, resolution->height()));
+    }
+    else
+    {
+        Napi::Error::New(env, "Could not get the current resolution of the output. Please Try again.");
+    }
+    return extendedResolution;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Object displayUtility = Napi::Object::New(env);
@@ -228,6 +249,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
     displayUtility.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
     displayUtility.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
+    displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
 
     exports.Set("DisplayUtility", displayUtility);
     

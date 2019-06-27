@@ -12,6 +12,9 @@ console.log(displayUtility.getPrimaryRROutput());
 //     height: 900
 // });
 
+// tslint:disable-next-line:no-console
+console.log(displayUtility.getExtendedMonitorResolution());
+
 async function testScreenCapturer(): Promise<void> {
     try {
         fs.writeFileSync('/tmp/output.h264', '');

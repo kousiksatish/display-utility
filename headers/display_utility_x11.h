@@ -18,6 +18,7 @@ public:
     std::set<OutputResolution> GetResolutions(RROutput rROutput);
     std::string GetOutputName(RROutput rROutput);
     RROutput GetPrimaryRROutput();
+    std::unique_ptr<OutputResolution> GetExtendedMonitorResolution();
 
 private:
     Display *display_;
