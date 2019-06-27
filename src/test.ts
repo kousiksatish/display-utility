@@ -15,6 +15,9 @@ console.log(displayUtility.getPrimaryRROutput());
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getExtendedMonitorResolution());
 
+// tslint:disable-next-line:no-console
+console.log(displayUtility.getAllCurrentResolutionsWithOffset());
+
 async function testScreenCapturer(): Promise<void> {
     try {
         fs.writeFileSync('/tmp/output.h264', '');

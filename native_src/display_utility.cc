@@ -237,6 +237,46 @@ Napi::Object GetExtendedMonitorResolution(const Napi::CallbackInfo &info)
     return extendedResolution;
 }
 
+Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
+{
+
+    Napi::Env env = info.Env();
+    Napi::Array currentResolutionsArray;
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+    // Get all connected outputs
+    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
+            currentResolutionsArray = Napi::Array::New(env);
+            for (unsigned int i = 0; i < numberOfOutputs; i += 1)
+            {
+                // Get current resolution with offset for each output
+                std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = desktopInfo->GetCurrentResolution(connectedOutputs[i]);
+
+                // Create new object with below properties and add to resultant array
+                Napi::Object outputWithResolution = Napi::Object::New(env);
+                outputWithResolution.Set("rrOutput", connectedOutputs[i]);
+                outputWithResolution.Set("offsetX", resolutionWithOffset->offsetX());
+                outputWithResolution.Set("offsetY", resolutionWithOffset->offsetY());
+                outputWithResolution.Set("width", resolutionWithOffset->width());
+                outputWithResolution.Set("height", resolutionWithOffset->height());
+                currentResolutionsArray.Set(i, outputWithResolution);
+
+                resolutionWithOffset = nullptr;
+            }
+            delete[] connectedOutputs;
+        }
+        return currentResolutionsArray;
+    }
+    Napi::Error::New(env, "Could not get the number of outputs of the display. Please try again.");
+    return currentResolutionsArray;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Object displayUtility = Napi::Object::New(env);
@@ -250,6 +290,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
     displayUtility.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
     displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
+    displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
 
     exports.Set("DisplayUtility", displayUtility);
     

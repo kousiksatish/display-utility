@@ -8,7 +8,7 @@ OutputResolutionWithOffset::OutputResolutionWithOffset(unsigned int width, unsig
 {
     offsetX_ = offsetX;
     offsetY_ = offsetY;
-    std::cout << "Constructor Output resolution with offset instance" << std::endl;
+    // std::cout << "Constructor Output resolution with offset instance" << std::endl;
 }
 int OutputResolutionWithOffset::offsetX() const
 {
