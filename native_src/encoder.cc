@@ -11,11 +11,7 @@ namespace remoting
     {   
         if (_isInitialised) {
             std::cout<<"Deleting stuff for reinitialising..";
-            delete this->_screenCapturer;
-            // x264_picture_clean(&_inputPic);
-            // x264_picture_clean(&_outputPic);
-            x264_encoder_close(_x264Encoder);
-            delete[] _yuvData;
+            this->CleanUp();
         }
         try
         {
@@ -250,14 +246,17 @@ namespace remoting
         return h;
     }
 
-    Encoder::~Encoder()
+    void Encoder::CleanUp()
     {
         delete this->_screenCapturer;
-        x264_encoder_close(_x264Encoder);
-        delete[] _yuvData;
-        x264_picture_clean(&_inputPic);
-        x264_picture_clean(&_outputPic);
-
+        delete[] this->_yuvData;
+        x264_picture_clean(&this->_inputPic);
+        x264_encoder_close(this->_x264Encoder);
         // sws_freeContext(_swsConverter);
+    }   
+
+    Encoder::~Encoder()
+    {
+        this->CleanUp();   
     }
 }

@@ -42,6 +42,7 @@ namespace remoting
             int64_t _i_frame_counter;
             void InitializeConverter(int width, int height);
             x264_t* OpenEncoder(int width, int height);
+            void CleanUp();
     };
 
 }
