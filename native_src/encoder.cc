@@ -248,8 +248,9 @@ namespace remoting
 
     void Encoder::CleanUp()
     {
+        std::cout<<"Cleanup invoked";
         delete this->_screenCapturer;
-        delete[] this->_yuvData;
+        // delete[] this->_yuvData;
         x264_picture_clean(&this->_inputPic);
         x264_encoder_close(this->_x264Encoder);
         // sws_freeContext(_swsConverter);
