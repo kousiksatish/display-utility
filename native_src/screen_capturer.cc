@@ -50,7 +50,7 @@ namespace remoting
     void ScreenCapturer::CaptureScreen() {
         // Use XGetDubImage to reuse the same memory
         if (!_multiMonitor) {
-            XGetSubImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap, _xImage, _width, _height);
+            XGetSubImage(_display, _window, _offsetX, _offsetY, _width, _height, AllPlanes, ZPixmap, _xImage, 0, 0);
         } else {
             for (auto res : _currentResolutions) {
                 XGetSubImage(_display, _window, res.offsetX(), res.offsetY(), res.width(), res.height(), AllPlanes, ZPixmap, _xImage, res.offsetX(), res.offsetY());
