@@ -8,27 +8,29 @@
 
 namespace remoting
 {
-    class ScreenCapturer {
-        public:
-            ScreenCapturer();
-            void InitializeMonitorProperties();
-            void InitializeMonitorProperties(RROutput rROutput);
-            uint8_t* GetDataPointer();
-            void CaptureScreen();
-            int GetWidth();
-            int GetHeight();
-            ~ScreenCapturer();
-        private: 
-            Display* _display;
-            Window _window;
-            int _offsetX;
-            int _offsetY;
-            int _width;
-            int _height;
-            XImage* _xImage;
-            std::set<OutputResolutionWithOffset> _currentResolutions;
-            bool _multiMonitor;
-    };
-}
+class ScreenCapturer
+{
+public:
+    ScreenCapturer();
+    void InitializeMonitorProperties();
+    void InitializeMonitorProperties(RROutput rROutput);
+    uint8_t *GetDataPointer();
+    void CaptureScreen();
+    int GetWidth();
+    int GetHeight();
+    ~ScreenCapturer();
+
+private:
+    Display *_display;
+    Window _window;
+    int _offsetX;
+    int _offsetY;
+    int _width;
+    int _height;
+    XImage *_xImage;
+    std::set<OutputResolutionWithOffset> _currentResolutions;
+    bool _multiMonitor;
+};
+} // namespace remoting
 
 #endif // REMOTING_HOST_SCREEN_CAPTURER_H_

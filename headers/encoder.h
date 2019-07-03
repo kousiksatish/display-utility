@@ -1,7 +1,6 @@
 #ifndef REMOTING_HOST_ENCODER_H_
 #define REMOTING_HOST_ENCODER_H_
 
-
 extern "C"
 {
 #include <stdint.h>
@@ -15,36 +14,37 @@ extern "C"
 
 namespace remoting
 {
-    class Encoder 
-    {
-        public:
-            Encoder();
-            void Init(RROutput rROutput = 0);
-            uint8_t* GetNextFrame(int* frameSize);
-            ~Encoder();
-        private:
-            ScreenCapturer* _screenCapturer;
-            x264_t* _x264Encoder;
-            SwsContext* _swsConverter;
-            uint8_t* _rgbData;
-            uint8_t* _rgbPlanes[3];
-            int _rgbStride[3];
-            uint8_t* _yuvData;
-            uint8_t* _yuvPlanes[3];
-            int _yuvStride[3];
-            bool _isInitialised;
-            x264_picture_t _inputPic;
-            x264_picture_t _outputPic;
-            x264_nal_t* _nal;
-            int _noOfNal;
-            int _width;
-            int _height;
-            int64_t _i_frame_counter;
-            void InitializeConverter(int width, int height);
-            x264_t* OpenEncoder(int width, int height);
-            void CleanUp();
-    };
+class Encoder
+{
+public:
+    Encoder();
+    void Init(RROutput rROutput = 0);
+    uint8_t *GetNextFrame(int *frameSize);
+    ~Encoder();
 
-}
+private:
+    ScreenCapturer *_screenCapturer;
+    x264_t *_x264Encoder;
+    SwsContext *_swsConverter;
+    uint8_t *_rgbData;
+    uint8_t *_rgbPlanes[3];
+    int _rgbStride[3];
+    uint8_t *_yuvData;
+    uint8_t *_yuvPlanes[3];
+    int _yuvStride[3];
+    bool _isInitialised;
+    x264_picture_t _inputPic;
+    x264_picture_t _outputPic;
+    x264_nal_t *_nal;
+    int _noOfNal;
+    int _width;
+    int _height;
+    int64_t _i_frame_counter;
+    void InitializeConverter(int width, int height);
+    x264_t *OpenEncoder(int width, int height);
+    void CleanUp();
+};
+
+} // namespace remoting
 
 #endif // REMOTING_HOST_ENCODER_H_
