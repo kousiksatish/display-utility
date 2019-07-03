@@ -9,8 +9,9 @@
         "-lX11",
         "-lXrandr",
         "-lXtst",
-        "-lx264",
-        "-lswscale"],
+        # "-lswscale", // Uncomment when swscale is used
+        "-lx264"
+      ],
       "target_name": "display-utility",
       "sources": [ 
         "native_src/display_utility.cc", 
