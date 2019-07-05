@@ -25,7 +25,7 @@ export interface IResolution {
     height: number;
 }
 
-export interface IResolutionWithOffset {
+export interface IResolutionWithOffset extends IResolution {
     offsetX: number;
     offsetY: number;
     rrOutput: number;
