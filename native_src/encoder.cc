@@ -7,7 +7,7 @@ Encoder::Encoder()
 {
     _isInitialised = false;
 }
-void Encoder::Init(RROutput rROutput)
+void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
 {
     if (_isInitialised)
     {
@@ -16,14 +16,13 @@ void Encoder::Init(RROutput rROutput)
     }
     try
     {
-        _screenCapturer = new ScreenCapturer();
-        if (rROutput != 0)
+        if (singleMonitorCapture)
         {
-            _screenCapturer->InitializeMonitorProperties(rROutput);
+            _screenCapturer = new SingleScreenCapturer(rROutput);
         }
         else
         {
-            _screenCapturer->InitializeMonitorProperties();
+            _screenCapturer = new MultiScreenCapturer();
         }
     }
     catch (std::string msg)
@@ -31,11 +30,8 @@ void Encoder::Init(RROutput rROutput)
         throw "ERROR: x264 Encoder initialisation failed." + msg;
     }
 
-    int width = _screenCapturer->GetWidth();
-    int height = _screenCapturer->GetHeight();
-
-    _width = width;
-    _height = height;
+    _width = _screenCapturer->GetWidth();
+    _height = _screenCapturer->GetHeight();
 
     _i_frame_counter = 0;
 
@@ -44,29 +40,29 @@ void Encoder::Init(RROutput rROutput)
     _rgbPlanes[0] = _rgbData;
     _rgbPlanes[1] = NULL;
     _rgbPlanes[2] = NULL;
-    _rgbStride[0] = 4 * width;
+    _rgbStride[0] = 4 * _width;
     _rgbStride[1] = 0;
     _rgbStride[2] = 0;
 
     // YUV output information
-    _yuvData = new uint8_t[3 * width * height / 2];
+    _yuvData = new uint8_t[3 * _width * _height / 2];
     _yuvPlanes[0] = _yuvData;
-    _yuvPlanes[1] = _yuvData + width * height;
-    _yuvPlanes[2] = _yuvData + width * height + width * height / 4;
-    _yuvStride[0] = width;
-    _yuvStride[1] = width / 2;
-    _yuvStride[2] = width / 2;
+    _yuvPlanes[1] = _yuvData + _width * _height;
+    _yuvPlanes[2] = _yuvData + _width * _height + _width * _height / 4;
+    _yuvStride[0] = _width;
+    _yuvStride[1] = _width / 2;
+    _yuvStride[2] = _width / 2;
 
     try
     {
         // Initialise x264 encoder
-        _x264Encoder = OpenEncoder(width, height);
+        _x264Encoder = OpenEncoder(_width, _height);
     }
     catch (const char *msg)
     {
         throw "ERROR: x264 Encoder initialisation failed. " + std::string(msg);
     }
-    // InitializeConverter(width, height);
+    // InitializeConverter(_width, _height);
 
     _isInitialised = true;
 }

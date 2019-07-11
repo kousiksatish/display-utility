@@ -27,14 +27,27 @@ void ScreenCaptureUtility::Init(const Napi::CallbackInfo &info)
 {
     try
     {
-        if (info.Length() >= 1 && info[0].IsNumber())
+        if (info.Length() < 1 || !info[0].IsBoolean())
         {
-            unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
-            this->_encoder->Init(rROutput);
+            throw "Invalid arguments";
+        }
+        bool singleMonitorCapture = info[0].As<Napi::Boolean>();
+        
+        if (singleMonitorCapture)
+        {
+            if (info.Length() < 2 || !info[1].IsNumber())
+            {
+                throw "Invalid arguments. RROutput required for SingleMonitorCapture";
+            }
+            else
+            {
+                unsigned int rROutput = info[1].As<Napi::Number>().Int32Value();
+                this->_encoder->Init(singleMonitorCapture, rROutput);
+            }
         }
         else
         {
-            this->_encoder->Init();
+            this->_encoder->Init(singleMonitorCapture);
         }
     }
     catch (const char *message)

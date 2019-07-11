@@ -22,7 +22,9 @@
         "native_src/output_resolution_with_offset.cc",
         "native_src/screen_capture_utility.cc",
         "native_src/encoder.cc",
-        "native_src/screen_capturer.cc"],
+        "native_src/base_screen_capturer.cc",
+        "native_src/single_screen_capturer.cc",
+        "native_src/multi_screen_capturer.cc"],
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }
   ]

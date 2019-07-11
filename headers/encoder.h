@@ -10,7 +10,9 @@ extern "C"
 #include "libavutil/frame.h"
 #include "libavutil/pixfmt.h"
 }
-#include "screen_capturer.h"
+#include "base_screen_capturer.h"
+#include "single_screen_capturer.h"
+#include "multi_screen_capturer.h"
 
 namespace remoting
 {
@@ -18,12 +20,12 @@ class Encoder
 {
 public:
     Encoder();
-    void Init(RROutput rROutput = 0);
+    void Init(bool singleMonitorCapture, RROutput rROutput = 0);
     uint8_t *GetNextFrame(int *frameSize);
     ~Encoder();
 
 private:
-    ScreenCapturer *_screenCapturer;
+    BaseScreenCapturer *_screenCapturer;
     x264_t *_x264Encoder;
     SwsContext *_swsConverter;
     uint8_t *_rgbData;

@@ -21,7 +21,7 @@ console.log(displayUtility.getAllCurrentResolutionsWithOffset());
 async function testScreenCapturer(): Promise<void> {
     try {
         fs.writeFileSync('/tmp/output.h264', '');
-        screenCaptureUtility.init(65);
+        screenCaptureUtility.init(true, 65);
         let numberOfFrames: number = 100;
         // tslint:disable-next-line: no-console
         console.time('fps');
@@ -35,7 +35,7 @@ async function testScreenCapturer(): Promise<void> {
         // tslint:disable-next-line: no-console
         console.timeEnd('fps');
 
-        screenCaptureUtility.init(66);
+        screenCaptureUtility.init(false);
         numberOfFrames = 100;
         // tslint:disable-next-line: no-console
         console.time('fps');
