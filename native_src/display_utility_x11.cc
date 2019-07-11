@@ -73,7 +73,7 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
             }
             if (currentRROutput == primaryRROutput)
             {
-                primaryOutputIndex = outputIndex;
+                primaryOutputIndex = numberOfOutputsConnected - 1;
             }
             XRRFreeOutputInfo(outputInfo);
         }
