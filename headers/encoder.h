@@ -6,7 +6,7 @@ extern "C"
 #include <stdint.h>
 #include <X11/Xutil.h>
 #include <x264.h>
-// #include "libswscale/swscale.h"
+#include "libswscale/swscale.h"
 #include "libavutil/frame.h"
 #include "libavutil/pixfmt.h"
 }
