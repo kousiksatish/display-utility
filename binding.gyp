@@ -10,7 +10,7 @@
         "-lXrandr",
         "-lXtst",
         # "-lswscale", // Uncomment when swscale is used
-        "-lx264"
+        "-l:libx264.so"
       ],
       "target_name": "display-utility",
       "sources": [ 
