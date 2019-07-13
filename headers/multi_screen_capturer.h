@@ -3,6 +3,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <X11/extensions/XShm.h>
 #include "display_utility_x11.h"
 #include "base_screen_capturer.h"
 #include <stdint.h>
@@ -27,6 +30,9 @@ private:
     int _height;
     XImage *_xImage;
     std::set<OutputResolutionWithOffset> _currentResolutions;
+    XShmSegmentInfo _shminfo;
+    Pixmap _shm_pixmap;
+    GC _shm_gc;
 };
 } // namespace remoting
 
