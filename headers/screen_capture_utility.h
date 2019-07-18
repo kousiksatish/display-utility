@@ -16,7 +16,7 @@ public:
 private:
     static Napi::FunctionReference constructor;
 
-    void GetNextFrame(const Napi::CallbackInfo &info);
+    Napi::Value GetNextFrame(const Napi::CallbackInfo &info);
     void Init(const Napi::CallbackInfo &info);
 
     Encoder *_encoder;

@@ -27,9 +27,7 @@ async function testScreenCapturer(): Promise<void> {
         console.time('fps');
         console.timeLog('fps');
         while (numberOfFrames !== 0) {
-            screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
-                writeToFile(frame);
-            });
+            writeToFile(screenCaptureUtility.getNextFrame());
             numberOfFrames = numberOfFrames - 1;
         }
         // tslint:disable-next-line: no-console
@@ -41,9 +39,7 @@ async function testScreenCapturer(): Promise<void> {
         console.time('fps');
         console.timeLog('fps');
         while (numberOfFrames !== 0) {
-            screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
-                writeToFile(frame);
-            });
+            writeToFile(screenCaptureUtility.getNextFrame());
             numberOfFrames = numberOfFrames - 1;
         }
         // tslint:disable-next-line: no-console
