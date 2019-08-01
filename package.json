@@ -68,6 +68,7 @@
     "native_src",
     "binding.gyp",
     "release/index.js",
-    "release/index.d.ts"
+    "release/index.d.ts",
+    "x264"
   ]
 }
