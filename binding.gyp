@@ -1,17 +1,26 @@
 {
+  "variables": {
+    "x264_root%": "<(module_root_dir)/x264"
+  },
   "targets": [
     { 
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
       "include_dirs" : [
-        "<!@(node -p \"require('node-addon-api').include\")"],
-      "libraries": [
-        "-lX11",
-        "-lXrandr",
-        "-lXtst",
-        # "-lswscale", // Uncomment when swscale is used
-        "-l:libx264.so"
+        "<!@(node -p \"require('node-addon-api').include\")"
       ],
+      "link_settings": {
+        "libraries": [
+          "-lX11",
+          "-lXrandr",
+          "-lXtst",
+          "-L<@(x264_root)/lib",
+          "-lx264"
+        ],
+        "ldflags": [
+          "-Wl,-rpath,<@(x264_root)/lib"
+        ]
+      },
       "target_name": "display-utility",
       "sources": [ 
         "native_src/display_utility.cc", 

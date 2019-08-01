@@ -5,10 +5,7 @@ extern "C"
 {
 #include <stdint.h>
 #include <X11/Xutil.h>
-#include <x264.h>
-#include "libswscale/swscale.h"
-#include "libavutil/frame.h"
-#include "libavutil/pixfmt.h"
+#include "../x264/headers/x264.h"
 }
 #include "base_screen_capturer.h"
 #include "single_screen_capturer.h"
@@ -27,7 +24,7 @@ public:
 private:
     BaseScreenCapturer *_screenCapturer;
     x264_t *_x264Encoder;
-    SwsContext *_swsConverter;
+    // SwsContext *_swsConverter;
     uint8_t *_rgbData;
     uint8_t *_rgbPlanes[3];
     int _rgbStride[3];
@@ -42,7 +39,7 @@ private:
     int _width;
     int _height;
     int64_t _i_frame_counter;
-    void InitializeConverter(int width, int height);
+    // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
     void CleanUp();
 };
