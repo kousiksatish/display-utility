@@ -15,7 +15,7 @@
           "-lXrandr",
           "-lXtst",
           "-L<@(x264_root)/lib",
-          "-lx264"
+          "-l:libx264.so.158"
         ],
         "ldflags": [
           "-Wl,-rpath,<@(x264_root)/lib"
