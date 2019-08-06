@@ -14,11 +14,7 @@
           "-lX11",
           "-lXrandr",
           "-lXtst",
-          "-L<@(x264_root)/lib",
-          "-lx264"
-        ],
-        "ldflags": [
-          "-Wl,-rpath,<@(x264_root)/lib"
+          "<@(x264_root)/lib/libx264.a"
         ]
       },
       "target_name": "display-utility",
