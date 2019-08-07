@@ -110,7 +110,7 @@ void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     }
 }
 
-void Encoder::InitializeConverter(int W, int H)
+/*void Encoder::InitializeConverter(int W, int H)
 {
     // Initialise swscale converter
     _swsConverter = sws_getContext(W, H, AV_PIX_FMT_BGRA, W, H, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
@@ -123,7 +123,7 @@ void Encoder::InitializeConverter(int W, int H)
         std::cout << "created scaling context succeeded." << std::endl;
     }
 }
-
+ */
 uint8_t *Encoder::GetNextFrame(int *frame_size)
 {
     if (!_isInitialised)
