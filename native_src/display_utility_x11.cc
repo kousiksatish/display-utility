@@ -218,7 +218,22 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 
 RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
-    return XRRGetOutputPrimary(display_, root_);
+    RROutput primaryRROutput = XRRGetOutputPrimary(display_, root_);
+    
+    // When primary monitor is not set, primaryRROutput is set to 0
+    if (primaryRROutput == 0) {
+        unsigned int numberOfOutputs = 0;
+        RROutput *connectedOutputs = nullptr;
+        // If primary monitor is not set, but monitors are connected, first one is assumed as primary
+        if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+        {
+            if (numberOfOutputs > 0) {
+                primaryRROutput = connectedOutputs[0];
+            }
+        }
+    }
+
+    return primaryRROutput;
 }
 
 std::unique_ptr<OutputResolution> DisplayUtilityX11::GetExtendedMonitorResolution()
