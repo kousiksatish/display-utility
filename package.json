@@ -1,7 +1,7 @@
 {
   "name": "@idrive-remotepc/display-utility",
-  "version": "0.1.0",
-  "description": "Utility to retrieve the information about the desktop display like number of outputs, output names, current resolution and list of resolutions using xrandr.",
+  "version": "1.0.0",
+  "description": "Linux utility to retrieve various information about desktop display, capture screen and convert them into video frames using xrandr and x264 encoding",
   "homepage": "https://github.com/idrive-remotepc/display-utility/blob/master/README.md",
   "bugs": {
     "url": "https://github.com/idrive-remotepc/display-utility/issues"
@@ -47,7 +47,9 @@
     "output",
     "linux",
     "mode",
-    "display-utility"
+    "display-utility",
+    "screen-capture",
+    "x264-encoding"
   ],
   "devDependencies": {
     "@types/bindings": "^1.3.0",
@@ -61,7 +63,7 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "lock-system": "^2.0.0",
-    "node-addon-api": "^1.6.3"
+    "node-addon-api": "^1.7.1"
   },
   "files": [
     "headers",
