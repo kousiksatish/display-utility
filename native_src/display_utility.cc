@@ -1,4 +1,4 @@
-#include <napi.h>
+#include <node_api.h>
 #include <iostream>
 #include "../headers/display_utility_x11.h"
 #include "../headers/screen_capture_utility.h"

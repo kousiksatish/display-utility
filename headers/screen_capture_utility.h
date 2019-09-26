@@ -1,7 +1,7 @@
 #ifndef REMOTING_HOST_SCREEN_CAPTURE_UTILITY_H_
 #define REMOTING_HOST_SCREEN_CAPTURE_UTILITY_H_
 
-#include <napi.h>
+#include <node_api.h>
 #include "encoder.h"
 
 namespace remoting
