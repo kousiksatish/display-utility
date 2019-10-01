@@ -36,11 +36,11 @@ Returns list of numbers which represents the RROutput corresponding to all the o
 
 ### displayUtility.getOutputName(rROutput: number): string
 
-Returns the name of the output given the RROutput number for that output
+Returns the name of the output (monitor) given the RROutput number for that output
 
 ### displayUtility.getCurrentResolution(rROutput: number): IResolution | undefined
 
-Returns the name of the output (monitor) given the RROutput number for that output
+Returns the current resolution of the output (monitor) given the RROutput number for that output
 
 ### displayUtility.getResolutions(rROutput: number): IResolution[] | undefined
 
@@ -68,13 +68,15 @@ Note: When no monitor is marked as primary, one of the connected monitor's RROut
 
 Get the complete resolution of the display when multiple monitors are connected.
 
+Note: Returns same value as getCurrentResolution(), when single monitor is connected
+
 ### displayUtility.getAllCurrentResolutionsWithOffset(): IResolutionWithOffset[] | undefined
 
 Get the position (x-offset and y-offset), height and width of connected monitors
 
 ### screenCaptureUtility.init(singleMonitorCapture: boolean, rROutput?: number): void
 
-Initialise the screen capturer and encoder for capturing screen.
+Initialises the screen capturer and x264 encoder for capturing screen.
 
 To capture a single output (monitor) with RROutput number 65 (example):
 
@@ -86,6 +88,16 @@ To capture the complete display including all connected outputs (monitors):
 
 ```typescript
 screenCaptureUtility.init();
+```
+
+### screenCaptureUtility.getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void
+
+Returns the captured and encoded frame buffer as a callback.
+
+```typescript
+screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
+    // perform operation with frame
+});
 ```
 
 ### lockUtility.lockScreen(): void
