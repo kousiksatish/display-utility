@@ -96,4 +96,19 @@ Locks the computer when executed
 
 Please feel free to raise issues on this repository, be it bugs or feature requests. We would be happy to address them.
 
+## Debugging
 
+Debugging the native node modules is possible using lldb extension in Visual Studio Code. Following are the steps:
+
+1. Install recommended vscode extension vadimcn.vscode-lldb.
+2. Install lldb in your system if it is not already installed.
+
+    ```console
+    # For debian
+    apt install lldb
+
+    # For RPM
+    yum install lldb
+    ```
+
+3. Write required functions to debug in test.ts and start debugging using F5.
