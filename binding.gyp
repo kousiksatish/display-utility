@@ -1,5 +1,6 @@
 {
   "variables": {
+    # x264_root as relative path to the module root
     "x264_root%": "<(module_root_dir)/x264"
   },
   "targets": [
@@ -11,10 +12,10 @@
       ],
       "link_settings": {
         "libraries": [
-          "-lX11",
-          "-lXrandr",
-          "-lXtst",
-          "<@(x264_root)/lib/libx264.a"
+          "-lX11", # provided by libx11-dev
+          "-lXrandr", # provided by libxrandr-dev
+          "-lXtst", # provided by libxtst-dev
+          "<@(x264_root)/lib/libx264.a" # static library exported with the package
         ]
       },
       "target_name": "display-utility",
@@ -30,6 +31,7 @@
         "native_src/base_screen_capturer.cc",
         "native_src/single_screen_capturer.cc",
         "native_src/multi_screen_capturer.cc"],
+      # To avoid native node modules from throwing cpp exception and raise pending JS exception which can be handled in JS
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }
   ]
