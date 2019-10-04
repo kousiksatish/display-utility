@@ -186,35 +186,17 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 
 RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
-    RROutput primaryRROutput = XRRGetOutputPrimary(display_, root_);
+    RROutput primaryRROutput = 0;
     
     unsigned int numberOfOutputs = 0;
     RROutput *connectedOutputs = nullptr;
 
+    // Primary, connected output will always be in the first position on this list if available
+    // If primary connected output is not available, one of the connected output will be in the first position and will be returned
+    // If no connected output is available, 0 will be returned
     if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
     {
-        bool setFirstConnectedOutputAsPrimary = false;
-        
-        // When primary monitor is not set, primaryRROutput is set to 0
-        if (primaryRROutput == 0) {
-            // If no primary is set, but monitors are connected, first one is assumed as primary
-            setFirstConnectedOutputAsPrimary = true;
-        } else {
-            // If primary is disconnected, it is not present in the connected outputs list, first connected is assumed as primary
-            bool isPrimaryConnected = false;
-            for (unsigned int i = 0; i < numberOfOutputs; i++) {
-                if (connectedOutputs[i] == primaryRROutput) {
-                    isPrimaryConnected = true;
-                    break;
-                }
-            }
-            if (!isPrimaryConnected) {
-                setFirstConnectedOutputAsPrimary = true;
-            }
-        }
-
-        // In both above cases, set the first connected output as primary
-        if (setFirstConnectedOutputAsPrimary && numberOfOutputs > 0) {
+        if (numberOfOutputs > 0) {
             primaryRROutput = connectedOutputs[0];
         }
     }
