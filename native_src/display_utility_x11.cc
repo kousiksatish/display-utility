@@ -70,10 +70,11 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
             if (outputInfo->connection == 0)
             {
                 tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
-            }
-            if (currentRROutput == primaryRROutput)
-            {
-                primaryOutputIndex = numberOfOutputsConnected - 1;
+                // Only consider if primary RROutput is in connected state
+                if (currentRROutput == primaryRROutput)
+                {
+                    primaryOutputIndex = outputIndex;
+                }
             }
             XRRFreeOutputInfo(outputInfo);
         }
@@ -218,18 +219,18 @@ std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
 
 RROutput DisplayUtilityX11::GetPrimaryRROutput()
 {
-    RROutput primaryRROutput = XRRGetOutputPrimary(display_, root_);
+    RROutput primaryRROutput = 0;
     
-    // When primary monitor is not set, primaryRROutput is set to 0
-    if (primaryRROutput == 0) {
-        unsigned int numberOfOutputs = 0;
-        RROutput *connectedOutputs = nullptr;
-        // If primary monitor is not set, but monitors are connected, first one is assumed as primary
-        if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
-        {
-            if (numberOfOutputs > 0) {
-                primaryRROutput = connectedOutputs[0];
-            }
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+
+    // Primary, connected output will always be in the first position on this list if available
+    // If primary connected output is not available, one of the connected output will be in the first position and will be returned
+    // If no connected output is available, 0 will be returned
+    if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (numberOfOutputs > 0) {
+            primaryRROutput = connectedOutputs[0];
         }
     }
 
