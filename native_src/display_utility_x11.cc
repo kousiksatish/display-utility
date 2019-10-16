@@ -73,7 +73,8 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
                 // Only consider if primary RROutput is in connected state
                 if (currentRROutput == primaryRROutput)
                 {
-                    primaryOutputIndex = outputIndex;
+                    // Use index in tmpOutputs
+                    primaryOutputIndex = numberOfOutputsConnected - 1;
                 }
             }
             XRRFreeOutputInfo(outputInfo);
