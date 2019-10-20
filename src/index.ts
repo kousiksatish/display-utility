@@ -21,7 +21,7 @@ interface INativeDisplayUtility {
     getOutputName(rROutput: number): string;
     getCurrentResolution(rROutput: number): IResolution | undefined;
     getResolutions(rROutput: number): IResolution[] | undefined;
-    setResolution(rROutput: number, resolution: IResolution): void;
+    setResolution(rROutput: number, resolution: IResolution, makeScreenBlank?: boolean): void;
     makeScreenBlank(): void;
     reverseBlankScreen(): void;
     getPrimaryRROutput(): number;

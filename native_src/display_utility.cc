@@ -139,6 +139,12 @@ void SetResolution(const Napi::CallbackInfo &info)
         return;
     }
 
+    bool shouldMakeScreenBlank = false;
+
+    if (info.Length() >= 3 && info[2].IsBoolean()) {
+        shouldMakeScreenBlank = info[2].As<Napi::Boolean>();
+    }
+
     unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
     
@@ -150,6 +156,10 @@ void SetResolution(const Napi::CallbackInfo &info)
     std::string setResolutionCommnad = "xrandr --output " + outputName + " --mode " + resolution;
     int return_value = system(setResolutionCommnad.c_str());
     std::cout << "The value returned by command " << setResolutionCommnad << " was: " << return_value << std::endl;
+
+    if (shouldMakeScreenBlank) {
+        desktopInfo->MakeScreenBlank();
+    }
     return;
 }
 
@@ -158,22 +168,8 @@ void MakeScreenBlank(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
 
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    unsigned int numberOfOutputs = 0;
-    RROutput *connectedOutputs = nullptr;
-    if (desktopInfo->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
-    {
-        if (connectedOutputs != nullptr)
-        {
-            std::string makeScreenBlankCommand = "xrandr";
-            for (unsigned int i = 0; i < numberOfOutputs; i++)
-            {
-                makeScreenBlankCommand += " --output " + desktopInfo->GetOutputName(*connectedOutputs) + " --brightness 0";
-                connectedOutputs++;
-            }
-            int returnValue = system(makeScreenBlankCommand.c_str());
-            std::cout << "The value returned by command " << makeScreenBlankCommand << " was: " << returnValue << std::endl;
-            return;
-        }
+    if (desktopInfo->MakeScreenBlank()) {
+        return;
     }
     Napi::Error::New(env, "Could not make the screen blank. Please try again.");
     return;

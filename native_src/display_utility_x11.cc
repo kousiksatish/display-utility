@@ -204,4 +204,26 @@ RROutput DisplayUtilityX11::GetPrimaryRROutput()
     return primaryRROutput;
 }
 
+bool DisplayUtilityX11::MakeScreenBlank()
+{
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+    if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::string makeScreenBlankCommand = "xrandr";
+            for (unsigned int i = 0; i < numberOfOutputs; i++)
+            {
+                makeScreenBlankCommand += " --output " + this->GetOutputName(*connectedOutputs) + " --brightness 0";
+                connectedOutputs++;
+            }
+            int returnValue = system(makeScreenBlankCommand.c_str());
+            std::cout << "The value returned by command " << makeScreenBlankCommand << " was: " << returnValue << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace remoting
