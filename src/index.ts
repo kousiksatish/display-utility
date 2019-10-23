@@ -116,4 +116,10 @@ interface IScreenCaptureUtility {
      * Returns the captured and encoded frame buffer as a callback
      */
     getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void;
+
+    /**
+     * Returns the captured and encoded frame buffer as a callback
+     * If getIFrame is passed as true, next frame will be generated as IFrame
+     */
+    getNextFrame(getIFrame: boolean, callback: (nextFrame: ArrayBuffer) => void): void;
 }
