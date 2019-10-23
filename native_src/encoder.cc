@@ -171,7 +171,9 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
     _inputPic.i_pts = _i_frame_counter;
     if (getIFrame) {
         _inputPic.i_type = X264_TYPE_IDR;
-    }    
+    } else {
+        _inputPic.i_type = X264_TYPE_AUTO;
+    }
     _i_frame_counter++;
 
     int i_frame_size = 0;
