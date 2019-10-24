@@ -170,8 +170,10 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
     _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
     _inputPic.i_pts = _i_frame_counter;
     if (getIFrame) {
+        // Set to force an iFrame
         _inputPic.i_type = X264_TYPE_IDR;
     } else {
+        // Set to get back to normal encodings
         _inputPic.i_type = X264_TYPE_AUTO;
     }
     _i_frame_counter++;
