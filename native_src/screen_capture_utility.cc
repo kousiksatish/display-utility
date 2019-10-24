@@ -6,7 +6,10 @@ Napi::FunctionReference ScreenCaptureUtility::constructor;
 Napi::Object ScreenCaptureUtility::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "ScreenCaptureUtility", {InstanceMethod("init", &ScreenCaptureUtility::Init), InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame)});
+    Napi::Function func = DefineClass(env, "ScreenCaptureUtility", {
+        InstanceMethod("init", &ScreenCaptureUtility::Init), 
+        InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame)
+    });
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -67,10 +70,22 @@ void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo &info)
     try
     {
         Napi::Env env = info.Env();
-        Napi::Function cb = info[0].As<Napi::Function>();
+        int callbackIndex = 0;
+        bool getIFrame = false;
+        if (info.Length() == 1 && info[0].IsFunction()) {
+            // Callback function in first position
+            callbackIndex = 0;
+        } else if (info.Length() == 2 && info[0].IsBoolean() && info[1].IsFunction()) {
+            // Callback function in second position and getIFrame boolean in firstPosition0
+            callbackIndex = 1;
+            getIFrame = info[0].As<Napi::Boolean>();
+        } else {
+            throw "Wrong parameters provided for getNextFrame";
+        }
+        Napi::Function cb = info[callbackIndex].As<Napi::Function>();
         int frame_size;
         uint8_t *nextFrame;
-        nextFrame = this->_encoder->GetNextFrame(&frame_size);
+        nextFrame = this->_encoder->GetNextFrame(&frame_size, getIFrame);
         cb.Call(env.Global(), {Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size)});
     }
     catch (const char *message)

@@ -124,7 +124,7 @@ void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     }
 }
  */
-uint8_t *Encoder::GetNextFrame(int *frame_size)
+uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
 {
     if (!_isInitialised)
     {
@@ -169,6 +169,13 @@ uint8_t *Encoder::GetNextFrame(int *frame_size)
     _inputPic.img.plane[1] = _yuvData + luma_size;
     _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
     _inputPic.i_pts = _i_frame_counter;
+    if (getIFrame) {
+        // Set to force an iFrame
+        _inputPic.i_type = X264_TYPE_IDR;
+    } else {
+        // Set to get back to normal encodings
+        _inputPic.i_type = X264_TYPE_AUTO;
+    }
     _i_frame_counter++;
 
     int i_frame_size = 0;
