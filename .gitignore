@@ -38,3 +38,7 @@ release
 
 # vscode related
 .vscode/ipch
+
+# exclude lock files
+package-lock.json
+yarn.lock
