@@ -215,8 +215,9 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     /* Configure non-default params */
     // x264Params.i_bitdepth = 8;
     x264Params.i_csp = X264_CSP_I420;
-    x264Params.i_width = width;
-    x264Params.i_height = height;
+    // Width and height should be even for encoder. Setting to next even number
+    x264Params.i_width = width + (width % 2);
+    x264Params.i_height = height + (height % 2);
     // x264Params.b_vfr_input = 0;
     x264Params.b_repeat_headers = 1;
     x264Params.b_annexb = 1;
