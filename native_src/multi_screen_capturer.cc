@@ -14,8 +14,8 @@ void MultiScreenCapturer::InitializeMonitorProperties()
 {
     XWindowAttributes attributes;
     XGetWindowAttributes(this->_display, this->_window, &attributes);
-    this->_width = attributes.width;
-    this->_height = attributes.height;
+    this->_width = attributes.width + (attributes.width%2);
+    this->_height = attributes.height + (attributes.height%2);
     Screen *screen = attributes.screen;
     this->_xImage = XShmCreateImage(this->_display, DefaultVisualOfScreen(screen), DefaultDepthOfScreen(screen), ZPixmap, NULL, &this->_shminfo, this->_width, this->_height);
 
