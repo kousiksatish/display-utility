@@ -244,7 +244,7 @@ Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
     Napi::Array currentResolutionsArray;
 
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    std::set<OutputResolutionWithOffset> currentResolutions = desktopInfo->GetAllCurrentResolutions();
+    std::vector<OutputResolutionWithOffset> currentResolutions = desktopInfo->GetAllCurrentResolutions();
     
     currentResolutionsArray = Napi::Array::New(env);
     int i = 0;

@@ -176,12 +176,12 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
     return resolutionsSet;
 }
 
-std::set<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResolutions()
+std::vector<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResolutions()
 {
     unsigned int numberOfOutputs = 0;
     RROutput *connectedOutputs = nullptr;
 
-    std::set<OutputResolutionWithOffset> currentResolutionsSet;
+    std::vector<OutputResolutionWithOffset> currentResolutionsSet;
 
     if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
     {
@@ -194,7 +194,7 @@ std::set<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResolutions
                 // Get current resolution with offset for each output
                 std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = this->GetCurrentResolution(connectedOutputs[i]);
                 OutputResolutionWithOffset* ptr = resolutionWithOffset.release();
-                currentResolutionsSet.insert(*ptr);
+                currentResolutionsSet.push_back(*ptr);
                 delete ptr;
             }
         }

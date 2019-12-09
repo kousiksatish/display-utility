@@ -1,6 +1,7 @@
 #ifndef REMOTING_HOST_DISPLAY_UTILITY_X11_H_
 #define REMOTING_HOST_DISPLAY_UTILITY_X11_H_
 #include <set>
+#include <vector>
 #include "base_macros.h"
 #include "screen_resources.h"
 
@@ -19,7 +20,7 @@ public:
     std::string GetOutputName(RROutput rROutput);
     RROutput GetPrimaryRROutput();
     std::unique_ptr<OutputResolution> GetExtendedMonitorResolution();
-    std::set<OutputResolutionWithOffset> GetAllCurrentResolutions();
+    std::vector<OutputResolutionWithOffset> GetAllCurrentResolutions();
 
 private:
     Display *display_;

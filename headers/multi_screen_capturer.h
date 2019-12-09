@@ -29,7 +29,7 @@ private:
     int _width;
     int _height;
     XImage *_xImage;
-    std::set<OutputResolutionWithOffset> _currentResolutions;
+    std::vector<OutputResolutionWithOffset> _currentResolutions;
     XShmSegmentInfo _shminfo;
     Pixmap _shm_pixmap;
     GC _shm_gc;
