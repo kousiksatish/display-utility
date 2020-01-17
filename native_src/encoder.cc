@@ -269,7 +269,6 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     // x264Params.b_vfr_input = 0;
     x264Params.b_repeat_headers = 1;
     x264Params.b_annexb = 1;
-    x264Params.b_open_gop = 30000;
 
     x264_param_apply_fastfirstpass(&x264Params);
 
