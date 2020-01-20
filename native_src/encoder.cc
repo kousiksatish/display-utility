@@ -210,6 +210,10 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
         }
         _i_frame_counter++;
 
+        if (_i_frame_counter < 5) {
+            isFrameDifferent = true;   
+        }
+        
         int i_frame_size = 0;
         try
         {
@@ -230,7 +234,7 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
                 
             } else {
                 // std::cout<<"Same frame";
-                usleep(20 * 1000);
+                usleep(30 * 1000);
             }
         }
         catch (const char *msg)
