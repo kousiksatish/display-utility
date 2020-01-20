@@ -250,10 +250,10 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     x264_param_t x264Params;
     x264_t *h;
 
-    int returnValue = x264_param_default_preset(&x264Params, x264_preset_names[2], x264_tune_names[7]);
+    int returnValue = x264_param_default_preset(&x264Params, x264_preset_names[0], x264_tune_names[7]);
     if (returnValue == 0)
     {
-        std::cout << x264_preset_names[2] << " preset is applied and " << x264_tune_names[7] << " tune is applied." << std::endl;
+        std::cout << x264_preset_names[0] << " preset is applied and " << x264_tune_names[7] << " tune is applied." << std::endl;
     }
     else
     {
@@ -269,6 +269,9 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     // x264Params.b_vfr_input = 0;
     x264Params.b_repeat_headers = 1;
     x264Params.b_annexb = 1;
+    
+    x264Params.i_keyint_max = INT32_MAX;
+    // x264Params.i_keyint_min = INT32_MAX;
 
     x264_param_apply_fastfirstpass(&x264Params);
 
