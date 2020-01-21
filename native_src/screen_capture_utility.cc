@@ -1,4 +1,5 @@
 #include "../headers/screen_capture_utility.h"
+#include "../headers/get_next_frame_worker.h"
 #include <iostream>
 using namespace remoting;
 Napi::FunctionReference ScreenCaptureUtility::constructor;
@@ -83,10 +84,10 @@ void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo &info)
             throw "Wrong parameters provided for getNextFrame";
         }
         Napi::Function cb = info[callbackIndex].As<Napi::Function>();
-        int frame_size;
-        uint8_t *nextFrame;
-        nextFrame = this->_encoder->GetNextFrame(&frame_size, getIFrame);
-        cb.Call(env.Global(), {Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size)});
+
+        GetNextFrameWorker *worker = new GetNextFrameWorker(this->_encoder, cb);
+        worker->Queue();
+        // cb.Call(env.Global(), {Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size)});
     }
     catch (const char *message)
     {

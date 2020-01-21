@@ -30,7 +30,8 @@
         "native_src/encoder.cc",
         "native_src/base_screen_capturer.cc",
         "native_src/single_screen_capturer.cc",
-        "native_src/multi_screen_capturer.cc"],
+        "native_src/multi_screen_capturer.cc",
+        "native_src/get_next_frame_worker.cc"],
       # To avoid native node modules from throwing cpp exception and raise pending JS exception which can be handled in JS
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }

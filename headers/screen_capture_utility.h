@@ -3,6 +3,7 @@
 
 #include <napi.h>
 #include "encoder.h"
+#include "get_next_frame_worker.h"
 
 namespace remoting
 {
@@ -20,6 +21,7 @@ private:
     void Init(const Napi::CallbackInfo &info);
 
     Encoder *_encoder;
+    GetNextFrameWorker *_worker;
 };
 } // namespace remoting
 

@@ -10,6 +10,7 @@ Encoder::Encoder()
 }
 void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
 {
+    XInitThreads();
     if (_isInitialised)
     {
         std::cout << "Deleting stuff for reinitialising..";
@@ -276,6 +277,7 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     
     x264Params.i_keyint_max = INT32_MAX;
     // x264Params.i_keyint_min = INT32_MAX;
+    // x264Params.i_avcintra_class
 
     x264_param_apply_fastfirstpass(&x264Params);
 
