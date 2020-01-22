@@ -70,23 +70,28 @@ void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo &info)
 {
     try
     {
-        Napi::Env env = info.Env();
         int callbackIndex = 0;
         bool getIFrame = false;
-        if (info.Length() == 1 && info[0].IsFunction()) {
+        if (info.Length() == 1 && info[0].IsFunction())
+        {
             // Callback function in first position
             callbackIndex = 0;
-        } else if (info.Length() == 2 && info[0].IsBoolean() && info[1].IsFunction()) {
+        }
+        else if (info.Length() == 2 && info[0].IsBoolean() && info[1].IsFunction())
+        {
             // Callback function in second position and getIFrame boolean in firstPosition0
             callbackIndex = 1;
             getIFrame = info[0].As<Napi::Boolean>();
-        } else {
+        }
+        else
+        {
             throw "Wrong parameters provided for getNextFrame";
         }
         Napi::Function cb = info[callbackIndex].As<Napi::Function>();
 
-        GetNextFrameWorker *worker = new GetNextFrameWorker(this->_encoder, cb);
+        GetNextFrameWorker *worker = new GetNextFrameWorker(this->_encoder, getIFrame, cb);
         worker->Queue();
+
         // cb.Call(env.Global(), {Napi::ArrayBuffer::New(info.Env(), nextFrame, frame_size)});
     }
     catch (const char *message)

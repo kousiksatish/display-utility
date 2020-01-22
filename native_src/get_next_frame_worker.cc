@@ -3,13 +3,14 @@
 
 using namespace remoting;
 
-GetNextFrameWorker::GetNextFrameWorker(Encoder* encoder, Napi::Function& callback) : Napi::AsyncWorker(callback), _encoder(encoder)
+GetNextFrameWorker::GetNextFrameWorker(Encoder* encoder, bool getIFrame, Napi::Function& callback)
+    : Napi::AsyncWorker(callback), _encoder(encoder), _get_i_frame(getIFrame)
 {
 }
 
 void GetNextFrameWorker::Execute()
 {
-    _next_frame = this->_encoder->GetNextFrame(&_frame_size, false);
+    _next_frame = this->_encoder->GetNextFrame(&_frame_size, _get_i_frame);
 }
 
 void GetNextFrameWorker::OnOK()
