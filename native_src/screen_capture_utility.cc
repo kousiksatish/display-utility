@@ -9,7 +9,8 @@ Napi::Object ScreenCaptureUtility::Init(Napi::Env env, Napi::Object exports)
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "ScreenCaptureUtility", {
         InstanceMethod("init", &ScreenCaptureUtility::Init), 
-        InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame)
+        InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame),
+        InstanceMethod("forceCallback", &ScreenCaptureUtility::ForceCallback)
     });
 
     constructor = Napi::Persistent(func);
@@ -102,6 +103,11 @@ void ScreenCaptureUtility::GetNextFrame(const Napi::CallbackInfo &info)
     {
         Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
     }
+}
+
+void ScreenCaptureUtility::ForceCallback(const Napi::CallbackInfo &info)
+{
+    this->_encoder->SetForceCallback();
 }
 
 ScreenCaptureUtility::~ScreenCaptureUtility()

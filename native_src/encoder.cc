@@ -158,6 +158,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, 
  */
 uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
 {
+    _force_callback = false;
     if (!_isInitialised)
     {
         throw "ERROR: ScreenCaptureUtility not initialised before use.";
@@ -211,7 +212,7 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
         }
         _i_frame_counter++;
 
-        if (_i_frame_counter < 5) {
+        if (_i_frame_counter < 5 || _force_callback) {
             isFrameDifferent = true;   
         }
         
@@ -229,9 +230,18 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
                 {
                     throw "No NAL is produced out of encoder.";
                 }
-                uint8_t* temp = _prevYUVData;
-                _prevYUVData = _yuvData;
-                _yuvData = temp;
+
+                if (!_force_callback) {
+                    uint8_t* temp = _prevYUVData;
+                    _prevYUVData = _yuvData;
+                    _yuvData = temp;    
+                } else {
+                    // Refresh prevYUVData in case of forced callback (For viewer minimized case)
+                    for(int i=0; i<3*_width*_height/2;i++) {
+                        _prevYUVData[i] = 0;
+                    }
+                }
+                
                 
             } else {
                 // std::cout<<"Same frame";
@@ -314,6 +324,12 @@ void Encoder::CleanUp()
     x264_picture_clean(&this->_inputPic);
     x264_encoder_close(this->_x264Encoder);
     // sws_freeContext(_swsConverter);
+}
+
+void Encoder::SetForceCallback()
+{
+    std::cout<<"Forcing callback";
+    this->_force_callback = true;
 }
 
 Encoder::~Encoder()

@@ -19,6 +19,7 @@ public:
     Encoder();
     void Init(bool singleMonitorCapture, RROutput rROutput = 0);
     uint8_t *GetNextFrame(int *frameSize, bool getIFrame = false);
+    void SetForceCallback();
     ~Encoder();
 
 private:
@@ -40,6 +41,7 @@ private:
     int _width;
     int _height;
     int64_t _i_frame_counter;
+    bool _force_callback;
     // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
     void CleanUp();

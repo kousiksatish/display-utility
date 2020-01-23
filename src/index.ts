@@ -119,7 +119,14 @@ interface IScreenCaptureUtility {
 
     /**
      * Returns the captured and encoded frame buffer as a callback
+     * Returns only if there is a change compared to previous captured frame.
+     * In case of no changes, every 30ms we look for frame change and return next frame
      * If getIFrame is passed as true, next frame will be generated as IFrame
      */
     getNextFrame(getIFrame: boolean, callback: (nextFrame: ArrayBuffer) => void): void;
+
+    /**
+     * Force callback from getNextFrame function if it is waiting for a change in frame
+     */
+    forceCallback(): void;
 }

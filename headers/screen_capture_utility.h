@@ -19,6 +19,7 @@ private:
 
     void GetNextFrame(const Napi::CallbackInfo &info);
     void Init(const Napi::CallbackInfo &info);
+    void ForceCallback(const Napi::CallbackInfo &info);
 
     Encoder *_encoder;
     GetNextFrameWorker *_worker;
