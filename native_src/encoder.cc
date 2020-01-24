@@ -289,7 +289,9 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     // x264Params.i_keyint_min = INT32_MAX;
     // x264Params.i_avcintra_class
 
-    x264Params.rc.f_rf_constant = 25;
+    int crfValue = 25;
+    x264Params.rc.f_rf_constant = crfValue;
+    std::cout<<"CRF set as "<<crfValue;
 
     x264_param_apply_fastfirstpass(&x264Params);
 
