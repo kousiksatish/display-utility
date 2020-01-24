@@ -289,6 +289,8 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     // x264Params.i_keyint_min = INT32_MAX;
     // x264Params.i_avcintra_class
 
+    x264Params.rc.f_rf_constant = 25;
+
     x264_param_apply_fastfirstpass(&x264Params);
 
     returnValue = x264_param_apply_profile(&x264Params, x264_profile_names[0]);
