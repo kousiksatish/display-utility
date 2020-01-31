@@ -7,6 +7,7 @@ namespace remoting
 Encoder::Encoder()
 {
     _isInitialised = false;
+    _use_xdamage = false;
 }
 void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
 {
@@ -72,6 +73,8 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
         throw "ERROR: x264 Encoder initialisation failed. " + std::string(msg);
     }
     // InitializeConverter(_width, _height);
+
+    InitXDamage();
 
     _isInitialised = true;
 }
@@ -322,6 +325,8 @@ x264_t *Encoder::OpenEncoder(int width, int height)
 
 void Encoder::CleanUp()
 {
+    if (_damage_handle)
+        XDamageDestroy(this->_screenCapturer->GetDisplay(), _damage_handle);
     std::cout << "Cleanup invoked";
     delete this->_screenCapturer;
     // delete[] this->_yuvData;  // Not necessary as x264_picture_clean clears yuvData
@@ -334,6 +339,32 @@ void Encoder::SetForceCallback()
 {
     std::cout<<"Forcing callback";
     this->_force_callback = true;
+}
+
+void Encoder::InitXDamage()
+{
+    // Check for XDamage extension.
+    if (!XDamageQueryExtension(_screenCapturer->GetDisplay(), &_damage_event_base,
+                                &_damage_error_base))
+    {
+        std::cout << "X server does not support XDamage." << std::endl;
+        return;
+    }
+    // TODO(lambroslambrou): Disable DAMAGE in situations where it is known
+    // to fail, such as when Desktop Effects are enabled, with graphics
+    // drivers (nVidia, ATI) that fail to report DAMAGE notifications
+    // properly.
+    // Request notifications every time the screen becomes damaged.
+    _damage_handle = XDamageCreate(_screenCapturer->GetDisplay(), _screenCapturer->GetWindow(),
+                                    XDamageReportNonEmpty);
+    if (!_damage_handle)
+    {
+        std::cout << "Unable to initialize XDamage." << std::endl;
+        return;
+    }
+
+    _use_xdamage = true;
+    std::cout << "Using XDamage extension." << std::endl;
 }
 
 Encoder::~Encoder()

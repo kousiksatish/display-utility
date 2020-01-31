@@ -6,6 +6,7 @@ extern "C"
 #include <stdint.h>
 #include <X11/Xutil.h>
 #include "../x264/headers/x264.h"
+#include <X11/extensions/Xdamage.h>
 }
 #include "base_screen_capturer.h"
 #include "single_screen_capturer.h"
@@ -45,6 +46,13 @@ private:
     // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
     void CleanUp();
+
+    // XDamage
+    void InitXDamage();
+    bool _use_xdamage;
+    Damage _damage_handle;
+    int _damage_event_base;
+    int _damage_error_base;
 };
 
 } // namespace remoting
