@@ -161,7 +161,6 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, 
  */
 uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
 {
-    _force_callback = false;
     if (!_isInitialised)
     {
         throw "ERROR: ScreenCaptureUtility not initialised before use.";
@@ -170,95 +169,57 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
     int W = _width;
     int H = _height;
 
+    XEvent e;
+    XNextEvent(this->_screenCapturer->GetDisplay(), &e);
+    try
+    {
+        _screenCapturer->CaptureScreen();
+    }
+    catch (const char *msg)
+    {
+        throw "ERROR: Screen capture of next frame failed. " + std::string(msg);
+    }
+    XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+    try
+    {
+        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, _prevYUVData, W, H);
+    }
+    catch (const char *msg)
+    {
+        throw "ERROR: RGB to YUV conversion failed. " + std::string(msg);
+    }
 
-    // int returnValue = sws_scale(_swsConverter, _rgbPlanes, _rgbStride, 0, H, _yuvPlanes, _yuvStride);
-    // if (returnValue == H)
-    // {
-    //     std::cout << "Converted the color space of the image." << std::endl;
-    // }
-    // else
-    // {
-    //     throw("Failed to convert the color space of the image.");
-    // }
-    bool isFrameDifferent = false;
-    while (!isFrameDifferent) {
-        try
-        {
-            _screenCapturer->CaptureScreen();
-        }
-        catch (const char *msg)
-        {
-            throw "ERROR: Screen capture of next frame failed. " + std::string(msg);
-        }
-        try
-        {
-            isFrameDifferent = Bitmap2Yuv420p_calc2(_yuvData, _rgbData, _prevYUVData, W, H);
-        }
-        catch (const char *msg)
-        {
-            throw "ERROR: RGB to YUV conversion failed. " + std::string(msg);
-        }
+    int luma_size = W * H;
+    int chroma_size = luma_size / 4;
 
-        int luma_size = W * H;
-        int chroma_size = luma_size / 4;
+    _inputPic.img.plane[0] = _yuvData;
+    _inputPic.img.plane[1] = _yuvData + luma_size;
+    _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
+    _inputPic.i_pts = _i_frame_counter;
+    if (getIFrame) {
+        // Set to force an iFrame
+        _inputPic.i_type = X264_TYPE_IDR;
+    } else {
+        // Set to get back to normal encodings
+        _inputPic.i_type = X264_TYPE_AUTO;
+    }
+    _i_frame_counter++;
 
-        _inputPic.img.plane[0] = _yuvData;
-        _inputPic.img.plane[1] = _yuvData + luma_size;
-        _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
-        _inputPic.i_pts = _i_frame_counter;
-        if (getIFrame) {
-            // Set to force an iFrame
-            _inputPic.i_type = X264_TYPE_IDR;
-        } else {
-            // Set to get back to normal encodings
-            _inputPic.i_type = X264_TYPE_AUTO;
-        }
-        _i_frame_counter++;
+    int i_frame_size = 0;
+    try
+    {
+        i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
+        *frame_size = i_frame_size;
 
-        if (_i_frame_counter < 5 || _force_callback) {
-            isFrameDifferent = true;   
-        }
-        
-        int i_frame_size = 0;
-        try
+        if (i_frame_size <= 0)
         {
-            if (isFrameDifferent) {
-                // std::cout<<"Diff frame";
-                i_frame_size = x264_encoder_encode(_x264Encoder, &_nal, &_noOfNal, &_inputPic, &_outputPic);
-                // std::cout<<i_frame_size;
-                *frame_size = i_frame_size;
-                
-
-                if (i_frame_size <= 0)
-                {
-                    throw "No NAL is produced out of encoder.";
-                }
-
-                if (!_force_callback) {
-                    uint8_t* temp = _prevYUVData;
-                    _prevYUVData = _yuvData;
-                    _yuvData = temp;    
-                } else {
-                    // Refresh prevYUVData in case of forced callback (For viewer minimized case)
-                    for(int i=0; i<3*_width*_height/2;i++) {
-                        _prevYUVData[i] = 0;
-                    }
-                }
-                
-                
-            } else {
-                // std::cout<<"Same frame";
-                usleep(30 * 1000);
-            }
-        }
-        catch (const char *msg)
-        {
-            throw "ERROR : Encoding failed. " + std::string(msg);
+            throw "No NAL is produced out of encoder.";
         }
     }
-    
-
-   
+    catch (const char *msg)
+    {
+        throw "ERROR : Encoding failed. " + std::string(msg);
+    }
 
     return _nal->p_payload;
 }
