@@ -2,6 +2,8 @@
 #define REMOTING_HOST_BASE_SCREEN_CAPTURER_H_
 
 #include <stdint.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 namespace remoting
 {
@@ -15,6 +17,11 @@ public:
     virtual int GetHeight() = 0;
     virtual int GetWidth() = 0;
     virtual ~BaseScreenCapturer() = 0;
+    Display* GetDisplay();
+    Window GetWindow();
+protected:
+    Display* _display;
+    Window _window;
 };
 } // namespace remoting
 

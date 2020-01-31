@@ -1,13 +1,11 @@
 #ifndef REMOTING_HOST_SINGLE_SCREEN_CAPTURER_H_
 #define REMOTING_HOST_SINGLE_SCREEN_CAPTURER_H_
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include "base_screen_capturer.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
 #include "display_utility_x11.h"
-#include "base_screen_capturer.h"
 #include <stdint.h>
 
 namespace remoting
@@ -23,8 +21,6 @@ public:
     ~SingleScreenCapturer();
     void InitializeMonitorProperties();
 private:
-    Display *_display;
-    Window _window;
     RROutput _rROutputOfScreen;
     int _offsetX;
     int _offsetY;
