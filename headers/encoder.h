@@ -30,7 +30,6 @@ private:
     uint8_t *_rgbData;
     // uint8_t *_rgbPlanes[3];
     // int _rgbStride[3];
-    uint8_t *_prevYUVData;
     uint8_t *_yuvData;
     // uint8_t *_yuvPlanes[3];
     // int _yuvStride[3];

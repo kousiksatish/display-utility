@@ -56,13 +56,6 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
     // _yuvStride[1] = _width / 2;
     // _yuvStride[2] = _width / 2;
 
-    // Previous frame YUV information
-    _prevYUVData = new uint8_t[3 * _width * _height / 2];
-
-    for(int i=0; i<3*_width*_height/2;i++) {
-        _prevYUVData[i] = 0;
-    }
-
     try
     {
         // Initialise x264 encoder
@@ -79,7 +72,7 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
     _isInitialised = true;
 }
 
-bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, size_t width, size_t height)
+bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
 {
     bool isFrameDifferent = false;
     size_t image_size = width * height;
@@ -98,13 +91,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, 
                 uint8_t g = rgb[4 * i + 1];
                 uint8_t r = rgb[4 * i + 2];
 
-                yValue = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
-                if (!isFrameDifferent) {
-                    if (yValue != prevYUV[i]) {
-                        isFrameDifferent = true;        
-                    }
-                }
-                destination[i++] = yValue;
+                destination[i++] = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
 
                 destination[upos++] = ((-38 * r + -74 * g + 112 * b) >> 8) + 128;
                 destination[vpos++] = ((112 * r + -94 * g + -18 * b) >> 8) + 128;
@@ -113,13 +100,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, 
                 g = rgb[4 * i + 1];
                 r = rgb[4 * i + 2];
 
-                yValue = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
-                if (!isFrameDifferent) {
-                    if (yValue != prevYUV[i]) {
-                        isFrameDifferent = true;        
-                    }
-                }
-                destination[i++] = yValue;
+                destination[i++] = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
             }
         }
         else
@@ -130,14 +111,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, uint8_t *prevYUV, 
                 uint8_t g = rgb[4 * i + 1];
                 uint8_t r = rgb[4 * i + 2];
 
-                yValue = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
-                if (!isFrameDifferent) {
-                    
-                    if (yValue != prevYUV[i]) {
-                        isFrameDifferent = true;        
-                    }
-                }
-                destination[i++] = yValue;
+                destination[i++] = ((66 * r + 129 * g + 25 * b) >> 8) + 16;
             }
         }
     }
@@ -182,7 +156,7 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
     XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
     try
     {
-        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, _prevYUVData, W, H);
+        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
     }
     catch (const char *msg)
     {
