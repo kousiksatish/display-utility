@@ -19,7 +19,7 @@ class Encoder
 public:
     Encoder();
     void Init(bool singleMonitorCapture, RROutput rROutput = 0);
-    uint8_t *GetNextFrame(int *frameSize, bool getIFrame = false);
+    uint8_t *GetNextFrame(int *frameSize, bool noChangeCheck = false, bool getIFrame = false);
     void SetForceCallback();
     ~Encoder();
 
@@ -52,6 +52,7 @@ private:
     Damage _damage_handle;
     int _damage_event_base;
     int _damage_error_base;
+    XEvent _damage_event;
 };
 
 } // namespace remoting

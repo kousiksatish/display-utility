@@ -79,7 +79,6 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     size_t upos = image_size;
     size_t vpos = upos + upos / 4;
     size_t i = 0;
-    uint8_t yValue;
     for (size_t line = 0; line < height; ++line)
     {
 
@@ -133,7 +132,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     }
 }
  */
-uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
+uint8_t *Encoder::GetNextFrame(int *frame_size, bool noChangeCheck, bool getIFrame)
 {
     if (!_isInitialised)
     {
@@ -143,8 +142,9 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool getIFrame)
     int W = _width;
     int H = _height;
 
-    XEvent e;
-    XNextEvent(this->_screenCapturer->GetDisplay(), &e);
+    if (!noChangeCheck) {
+        XNextEvent(this->_screenCapturer->GetDisplay(), &_damage_event);
+    }
     try
     {
         _screenCapturer->CaptureScreen();
