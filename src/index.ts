@@ -128,5 +128,10 @@ interface IScreenCaptureUtility {
     /**
      * Force callback from getNextFrame function if it is waiting for a change in frame
      */
-    forceCallback(): void;
+    forceNextFrame(): void;
+
+    /**
+     * Force the next frame to be an iframe. Call will also force the next frame and return any waiting getNextFrame callback
+     */
+    sendNextFrameAsIFrame(): void;
 }

@@ -195,7 +195,9 @@ uint8_t *Encoder::CaptureAndEncode(int *frame_size) {
     _inputPic.i_pts = _i_frame_counter;
     if (_next_frame_as_iframe) {
         // Set to force an iFrame
+        std::cout<<"Sending an iFrame from encoder";
         _inputPic.i_type = X264_TYPE_IDR;
+        _next_frame_as_iframe = false;
     } else {
         // Set to get back to normal encodings
         _inputPic.i_type = X264_TYPE_AUTO;
@@ -293,9 +295,14 @@ void Encoder::CleanUp()
     // sws_freeContext(_swsConverter);
 }
 
-void Encoder::SetForceCallback()
+void Encoder::SetForceNextFrame()
 {
-    std::cout<<"Forcing callback";
+    this->_force_next_frame = true;
+}
+
+void Encoder::SendNextFrameAsIFrame()
+{
+    this->_next_frame_as_iframe = true;
     this->_force_next_frame = true;
 }
 

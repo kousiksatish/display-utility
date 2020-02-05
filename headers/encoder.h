@@ -20,7 +20,8 @@ public:
     Encoder();
     void Init(bool singleMonitorCapture, RROutput rROutput = 0);
     uint8_t *GetNextFrame(int *frameSize);
-    void SetForceCallback();
+    void SetForceNextFrame();
+    void SendNextFrameAsIFrame();
     ~Encoder();
 
 private:
