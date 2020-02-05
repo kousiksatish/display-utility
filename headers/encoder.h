@@ -19,7 +19,7 @@ class Encoder
 public:
     Encoder();
     void Init(bool singleMonitorCapture, RROutput rROutput = 0);
-    uint8_t *GetNextFrame(int *frameSize, bool noChangeCheck = false, bool getIFrame = false);
+    uint8_t *GetNextFrame(int *frameSize);
     void SetForceCallback();
     ~Encoder();
 

@@ -132,7 +132,7 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     }
 }
  */
-uint8_t *Encoder::GetNextFrame(int *frame_size, bool noChangeCheck, bool getIFrame)
+uint8_t *Encoder::GetNextFrame(int *frame_size)
 {
     if (!_isInitialised)
     {
