@@ -41,10 +41,11 @@ private:
     int _width;
     int _height;
     int64_t _i_frame_counter;
-    bool _force_callback;
+    bool _force_next_frame;
+    bool _next_frame_as_iframe;
     // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
-    uint8_t *CaptureAndEncode(int* frame_size, bool getIFrame);
+    uint8_t *CaptureAndEncode(int *frameSize);
     void CleanUp();
 
     // XDamage
@@ -53,7 +54,7 @@ private:
     Damage _damage_handle;
     int _damage_event_base;
     int _damage_error_base;
-    XEvent _damage_event;
+    XEvent _event;
 };
 
 } // namespace remoting

@@ -138,17 +138,36 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool noChangeCheck, bool getIFra
     {
         throw "ERROR: ScreenCaptureUtility not initialised before use.";
     }
-
-    if (!noChangeCheck) {
-        XNextEvent(this->_screenCapturer->GetDisplay(), &_damage_event);
+    while (1) {
+        int pendingEvents = 0;
+        if (!_use_xdamage || _force_next_frame) {
+            if (_use_xdamage) {
+                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+            }
+            _force_next_frame = false;
+            return CaptureAndEncode(frame_size);
+        } else {
+            pendingEvents = XPending(this->_screenCapturer->GetDisplay());
+            bool damage_event_flag = false;
+            for(int i = 0; i < pendingEvents; i++) {
+                XNextEvent(this->_screenCapturer->GetDisplay(), &_event);
+                if (_event.type == _damage_event_base + XDamageNotify)
+                {
+                    damage_event_flag = true;
+                }
+            }
+            if (damage_event_flag) {
+                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+                return CaptureAndEncode(frame_size);    
+            } else {
+                usleep(30 * 1000);
+            }
+        }
     }
-
-    return CaptureAndEncode(frame_size, getIFrame);
-    
 }
 
-uint8_t* Encoder::CaptureAndEncode(int* frame_size, bool getIFrame)
-{
+uint8_t *Encoder::CaptureAndEncode(int *frame_size) {
+    
     try
     {
         _screenCapturer->CaptureScreen();
@@ -157,7 +176,7 @@ uint8_t* Encoder::CaptureAndEncode(int* frame_size, bool getIFrame)
     {
         throw "ERROR: Screen capture of next frame failed. " + std::string(msg);
     }
-    XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+    
     try
     {
         Bitmap2Yuv420p_calc2(_yuvData, _rgbData, _width, _height);
@@ -174,7 +193,7 @@ uint8_t* Encoder::CaptureAndEncode(int* frame_size, bool getIFrame)
     _inputPic.img.plane[1] = _yuvData + luma_size;
     _inputPic.img.plane[2] = _yuvData + luma_size + chroma_size;
     _inputPic.i_pts = _i_frame_counter;
-    if (getIFrame) {
+    if (_next_frame_as_iframe) {
         // Set to force an iFrame
         _inputPic.i_type = X264_TYPE_IDR;
     } else {
@@ -277,7 +296,7 @@ void Encoder::CleanUp()
 void Encoder::SetForceCallback()
 {
     std::cout<<"Forcing callback";
-    this->_force_callback = true;
+    this->_force_next_frame = true;
 }
 
 void Encoder::InitXDamage()
