@@ -44,6 +44,7 @@ private:
     bool _force_callback;
     // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
+    uint8_t *CaptureAndEncode(int* frame_size, bool getIFrame);
     void CleanUp();
 
     // XDamage

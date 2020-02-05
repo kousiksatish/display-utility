@@ -139,12 +139,16 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool noChangeCheck, bool getIFra
         throw "ERROR: ScreenCaptureUtility not initialised before use.";
     }
 
-    int W = _width;
-    int H = _height;
-
     if (!noChangeCheck) {
         XNextEvent(this->_screenCapturer->GetDisplay(), &_damage_event);
     }
+
+    return CaptureAndEncode(frame_size, getIFrame);
+    
+}
+
+uint8_t* Encoder::CaptureAndEncode(int* frame_size, bool getIFrame)
+{
     try
     {
         _screenCapturer->CaptureScreen();
@@ -156,14 +160,14 @@ uint8_t *Encoder::GetNextFrame(int *frame_size, bool noChangeCheck, bool getIFra
     XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
     try
     {
-        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, W, H);
+        Bitmap2Yuv420p_calc2(_yuvData, _rgbData, _width, _height);
     }
     catch (const char *msg)
     {
         throw "ERROR: RGB to YUV conversion failed. " + std::string(msg);
     }
 
-    int luma_size = W * H;
+    int luma_size = _width * _height;
     int chroma_size = luma_size / 4;
 
     _inputPic.img.plane[0] = _yuvData;
