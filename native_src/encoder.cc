@@ -253,7 +253,7 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     x264Params.b_repeat_headers = 1;
     x264Params.b_annexb = 1;
     
-    x264Params.i_keyint_max = INT32_MAX;
+    x264Params.i_keyint_max = 5000;
     // x264Params.i_keyint_min = INT32_MAX;
     // x264Params.i_avcintra_class
 
