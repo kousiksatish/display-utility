@@ -15,6 +15,8 @@
           "-lX11", # provided by libx11-dev
           "-lXrandr", # provided by libxrandr-dev
           "-lXtst", # provided by libxtst-dev
+          "-lXdamage",
+          "-lXfixes",
           "<@(x264_root)/lib/libx264.a" # static library exported with the package
         ]
       },
