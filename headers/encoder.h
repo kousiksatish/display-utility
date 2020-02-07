@@ -55,6 +55,7 @@ private:
     Damage _damage_handle;
     int _damage_event_base;
     int _damage_error_base;
+    XserverRegion _damage_region;
     XEvent _event;
 };
 

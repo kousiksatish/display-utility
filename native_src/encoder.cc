@@ -141,9 +141,9 @@ uint8_t *Encoder::GetNextFrame(int *frame_size)
     while (1) {
         int pendingEvents = 0;
         if (!_use_xdamage || _force_next_frame) {
-            if (_use_xdamage) {
-                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
-            }
+            // if (_use_xdamage) {
+            //     XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+            // }
             _force_next_frame = false;
             return CaptureAndEncode(frame_size);
         } else {
@@ -157,7 +157,12 @@ uint8_t *Encoder::GetNextFrame(int *frame_size)
                 }
             }
             if (damage_event_flag) {
-                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, None);
+                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, _damage_region);
+                int rects_num = 0;
+                XRectangle bounds;
+                XRectangle* rects = XFixesFetchRegionAndBounds(this->_screenCapturer->GetDisplay(), _damage_region,
+                                                            &rects_num, &bounds);
+                XFree(rects);
                 return CaptureAndEncode(frame_size);    
             } else {
                 usleep(30 * 1000);
@@ -325,6 +330,15 @@ void Encoder::InitXDamage()
     if (!_damage_handle)
     {
         std::cout << "Unable to initialize XDamage." << std::endl;
+        return;
+    }
+
+    // Create an XFixes server-side region to collate damage into.
+    _damage_region = XFixesCreateRegion(_screenCapturer->GetDisplay(), 0, 0);
+    if (!_damage_region)
+    {
+        XDamageDestroy(_screenCapturer->GetDisplay(), _damage_handle);
+        std::cout << "Unable to create XFixes region." << std::endl;
         return;
     }
 
