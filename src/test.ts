@@ -60,3 +60,27 @@ function writeToFile(input: ArrayBuffer): void {
 
 // tslint:disable-next-line: no-floating-promises
 // testScreenCapturer();
+
+function testForceFrame(): void {
+
+    screenCaptureUtility.init(false);
+
+    setInterval(() => {
+        screenCaptureUtility.forceNextFrame();
+    },          1000);
+
+    setTimeout(() => {
+        screenCaptureUtility.init(true, 65);
+     },        5000);
+    processFrame();
+}
+
+function processFrame(): void {
+    screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
+        // tslint:disable-next-line: no-console
+        console.log(`Received ${frame.byteLength}`);
+        processFrame();
+    });
+}
+
+// testForceFrame();
