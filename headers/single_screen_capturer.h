@@ -13,7 +13,7 @@ namespace remoting
 class SingleScreenCapturer : public BaseScreenCapturer
 {
 public:
-    SingleScreenCapturer(RROutput rROutput);
+    SingleScreenCapturer(Display* display, Window window, RROutput rROutput);
     uint8_t *GetDataPointer();
     void CaptureScreen();
     int GetWidth();

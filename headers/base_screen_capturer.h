@@ -17,8 +17,6 @@ public:
     virtual int GetHeight() = 0;
     virtual int GetWidth() = 0;
     virtual ~BaseScreenCapturer() = 0;
-    Display* GetDisplay();
-    Window GetWindow();
 protected:
     Display* _display;
     Window _window;

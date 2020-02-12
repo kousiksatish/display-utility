@@ -13,7 +13,7 @@ namespace remoting
 class MultiScreenCapturer : public BaseScreenCapturer
 {
 public:
-    MultiScreenCapturer();
+    MultiScreenCapturer(Display* display, Window window);
     void InitializeMonitorProperties();
     uint8_t *GetDataPointer();
     void CaptureScreen();

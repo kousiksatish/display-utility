@@ -13,14 +13,4 @@ BaseScreenCapturer::~BaseScreenCapturer()
     
 }
 
-Display* BaseScreenCapturer::GetDisplay()
-{
-    return this->_display;
-}
-
-Window BaseScreenCapturer::GetWindow()
-{
-    return this->_window;
-}
-
 }

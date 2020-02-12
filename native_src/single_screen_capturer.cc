@@ -3,10 +3,10 @@
 
 namespace remoting
 {
-SingleScreenCapturer::SingleScreenCapturer(RROutput rROutput)
-{
-    this->_display = XOpenDisplay(NULL);
-    this->_window = DefaultRootWindow(this->_display);
+SingleScreenCapturer::SingleScreenCapturer(Display* display, Window window, RROutput rROutput)
+{   
+    this->_display = display;
+    this->_window = window;
     this->_rROutputOfScreen = rROutput;
     this->InitializeMonitorProperties();
 }
@@ -75,6 +75,5 @@ SingleScreenCapturer::~SingleScreenCapturer()
     XDestroyImage(this->_xImage);
     XShmDetach(this->_display, &this->_shminfo);
     shmdt(this->_shminfo.shmaddr);
-    XCloseDisplay(this->_display);
 }
 } // namespace remoting

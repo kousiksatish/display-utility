@@ -16,16 +16,21 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
     {
         std::cout << "Deleting stuff for reinitialising..";
         this->CleanUp();
+    } else {
+        // Initialise only in the first time
+        _display = XOpenDisplay(NULL);
+        _window = DefaultRootWindow(_display);
     }
+    
     try
     {
         if (singleMonitorCapture)
         {
-            _screenCapturer = new SingleScreenCapturer(rROutput);
+            _screenCapturer = new SingleScreenCapturer(_display, _window, rROutput);
         }
         else
         {
-            _screenCapturer = new MultiScreenCapturer();
+            _screenCapturer = new MultiScreenCapturer(_display, _window);
         }
     }
     catch (std::string msg)
@@ -147,20 +152,20 @@ uint8_t *Encoder::GetNextFrame(int *frame_size)
             _force_next_frame = false;
             return CaptureAndEncode(frame_size);
         } else {
-            pendingEvents = XPending(this->_screenCapturer->GetDisplay());
+            pendingEvents = XPending(this->_display);
             bool damage_event_flag = false;
             for(int i = 0; i < pendingEvents; i++) {
-                XNextEvent(this->_screenCapturer->GetDisplay(), &_event);
+                XNextEvent(this->_display, &_event);
                 if (_event.type == _damage_event_base + XDamageNotify)
                 {
                     damage_event_flag = true;
                 }
             }
             if (damage_event_flag) {
-                XDamageSubtract(this->_screenCapturer->GetDisplay(), _damage_handle, None, _damage_region);
+                XDamageSubtract(this->_display, _damage_handle, None, _damage_region);
                 int rects_num = 0;
                 XRectangle bounds;
-                XRectangle* rects = XFixesFetchRegionAndBounds(this->_screenCapturer->GetDisplay(), _damage_region,
+                XRectangle* rects = XFixesFetchRegionAndBounds(this->_display, _damage_region,
                                                             &rects_num, &bounds);
                 XFree(rects);
                 return CaptureAndEncode(frame_size);    
@@ -291,7 +296,7 @@ x264_t *Encoder::OpenEncoder(int width, int height)
 void Encoder::CleanUp()
 {
     if (_damage_handle)
-        XDamageDestroy(this->_screenCapturer->GetDisplay(), _damage_handle);
+        XDamageDestroy(this->_display, _damage_handle);
     std::cout << "Cleanup invoked";
     delete this->_screenCapturer;
     // delete[] this->_yuvData;  // Not necessary as x264_picture_clean clears yuvData
@@ -314,7 +319,7 @@ void Encoder::SendNextFrameAsIFrame()
 void Encoder::InitXDamage()
 {
     // Check for XDamage extension.
-    if (!XDamageQueryExtension(_screenCapturer->GetDisplay(), &_damage_event_base,
+    if (!XDamageQueryExtension(this->_display, &_damage_event_base,
                                 &_damage_error_base))
     {
         std::cout << "X server does not support XDamage." << std::endl;
@@ -325,7 +330,7 @@ void Encoder::InitXDamage()
     // drivers (nVidia, ATI) that fail to report DAMAGE notifications
     // properly.
     // Request notifications every time the screen becomes damaged.
-    _damage_handle = XDamageCreate(_screenCapturer->GetDisplay(), _screenCapturer->GetWindow(),
+    _damage_handle = XDamageCreate(this->_display, this->_window,
                                     XDamageReportNonEmpty);
     if (!_damage_handle)
     {
@@ -334,10 +339,10 @@ void Encoder::InitXDamage()
     }
 
     // Create an XFixes server-side region to collate damage into.
-    _damage_region = XFixesCreateRegion(_screenCapturer->GetDisplay(), 0, 0);
+    _damage_region = XFixesCreateRegion(this->_display, 0, 0);
     if (!_damage_region)
     {
-        XDamageDestroy(_screenCapturer->GetDisplay(), _damage_handle);
+        XDamageDestroy(this->_display, _damage_handle);
         std::cout << "Unable to create XFixes region." << std::endl;
         return;
     }
@@ -349,5 +354,6 @@ void Encoder::InitXDamage()
 Encoder::~Encoder()
 {
     this->CleanUp();
+    XCloseDisplay(this->_display);
 }
 } // namespace remoting

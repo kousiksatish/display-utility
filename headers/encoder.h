@@ -25,15 +25,16 @@ public:
     ~Encoder();
 
 private:
+    // Capture properties
+    Display* _display;
+    Window _window;
     BaseScreenCapturer *_screenCapturer;
+    uint8_t *_rgbData;
+
+    // Encoder properties
     x264_t *_x264Encoder;
     // SwsContext *_swsConverter;
-    uint8_t *_rgbData;
-    // uint8_t *_rgbPlanes[3];
-    // int _rgbStride[3];
     uint8_t *_yuvData;
-    // uint8_t *_yuvPlanes[3];
-    // int _yuvStride[3];
     bool _isInitialised;
     x264_picture_t _inputPic;
     x264_picture_t _outputPic;

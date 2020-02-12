@@ -3,10 +3,10 @@
 
 namespace remoting
 {
-MultiScreenCapturer::MultiScreenCapturer()
+MultiScreenCapturer::MultiScreenCapturer(Display* display, Window window)
 {
-    this->_display = XOpenDisplay(NULL);
-    this->_window = DefaultRootWindow(this->_display);
+    this->_display = display;
+    this->_window = window;
     this->InitializeMonitorProperties();
 }
 
@@ -89,6 +89,5 @@ MultiScreenCapturer::~MultiScreenCapturer()
     XFreeGC(this->_display, this->_shm_gc);
     XShmDetach(this->_display, &this->_shminfo);
     shmdt(this->_shminfo.shmaddr);
-    XCloseDisplay(this->_display);
 }
 } // namespace remoting
