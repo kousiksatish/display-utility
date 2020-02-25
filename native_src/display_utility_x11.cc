@@ -67,7 +67,8 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
                 std::cout << "Could not get output info of index: " << outputIndex << std::endl;
                 return false;
             }
-            if (outputInfo->connection == 0)
+            // Crtc is 0 if output is off
+            if (outputInfo->connection == 0 && outputInfo->crtc)
             {
                 tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
                 // Only consider if primary RROutput is in connected state
