@@ -195,7 +195,11 @@ std::vector<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResoluti
                 // Get current resolution with offset for each output
                 std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = this->GetCurrentResolution(connectedOutputs[i]);
                 OutputResolutionWithOffset* ptr = resolutionWithOffset.release();
-                currentResolutionsSet.push_back(*ptr);
+                if (ptr != nullptr)
+                {
+                    currentResolutionsSet.push_back(*ptr);
+                }
+
                 delete ptr;
             }
         }
