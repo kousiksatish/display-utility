@@ -77,9 +77,8 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
     _isInitialised = true;
 }
 
-bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
+void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size_t height)
 {
-    bool isFrameDifferent = false;
     size_t image_size = width * height;
     size_t upos = image_size;
     size_t vpos = upos + upos / 4;
@@ -119,8 +118,6 @@ bool Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
             }
         }
     }
-
-    return isFrameDifferent;
 }
 
 /*void Encoder::InitializeConverter(int W, int H)
