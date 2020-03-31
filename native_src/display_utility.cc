@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../headers/display_utility_x11.h"
 #include "../headers/screen_capture_utility.h"
+#include "../headers/user_session_utility.h"
 using namespace remoting;
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
@@ -263,6 +264,28 @@ Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
     return currentResolutionsArray;
 }
 
+Napi::Array GetUserSessionInfo(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+    Napi::Array userSessionInfoList;
+
+    UserSessionUtility userSessionUtility;
+    std::vector<utmpx> utmpxList = userSessionUtility.GetUserInfoFromUTMPRegister();
+    userSessionInfoList = Napi::Array::New(env);
+    int i = 0;
+    for(utmpx utmpxEntry : utmpxList)
+    {
+        Napi::Object userSessionInfo = Napi::Object::New(env);
+        userSessionInfo.Set("userName", utmpxEntry.ut_user);
+        userSessionInfo.Set("tty", utmpxEntry.ut_line);
+        userSessionInfo.Set("pid", utmpxEntry.ut_pid);
+        userSessionInfo.Set("sessionId", utmpxEntry.ut_id);
+        userSessionInfoList.Set(i, userSessionInfo);
+        i++;
+    }
+    return userSessionInfoList;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Object displayUtility = Napi::Object::New(env);
@@ -279,6 +302,12 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
 
     exports.Set("DisplayUtility", displayUtility);
+
+    Napi::Object userSessionUtility = Napi::Object::New(env);
+
+    userSessionUtility.Set(Napi::String::New(env, "getUserSessionInfo"), Napi::Function::New(env, GetUserSessionInfo));
+
+    exports.Set("UserSessionUtility", userSessionUtility);
     
     return ScreenCaptureUtility::Init(env, exports);
 }

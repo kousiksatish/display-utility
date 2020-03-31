@@ -84,3 +84,6 @@ function processFrame(): void {
 }
 
 // testForceFrame();
+
+// tslint:disable-next-line: no-console
+console.log(userSessionUtility.getUserSessionInfo());
