@@ -143,7 +143,7 @@ interface INativeUserSessionUtility {
     getUserSessionInfo(): IUserSessionInfo[];
 }
 
-interface IUserSessionInfo {
+export interface IUserSessionInfo {
     userName: string;
     pid: number;
     tty: string;
