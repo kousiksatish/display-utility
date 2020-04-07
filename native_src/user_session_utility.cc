@@ -8,10 +8,10 @@ UserSessionUtility::UserSessionUtility()
 
 std::vector<utmpx> UserSessionUtility::GetUserInfoFromUTMPRegister()
 {
-    struct utmpx *UtmpxPtr = NULL;
+    struct utmpx *UtmpxPtr = nullptr;
     setutxent();
     std::vector<utmpx> userSessionInfoList;
-    while ((UtmpxPtr = getutxent()) != NULL)
+    while ((UtmpxPtr = getutxent()) != nullptr)
     {
         if (UtmpxPtr->ut_type != USER_PROCESS)
         {
