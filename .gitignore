@@ -23,7 +23,7 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+# *.a We are including libx264.a static library in the project which needs to be included in npm tarball
 *.lib
 
 # Executables

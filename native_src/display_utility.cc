@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <iostream>
 #include "../headers/display_utility_x11.h"
+#include "../headers/screen_capture_utility.h"
 using namespace remoting;
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
@@ -72,10 +73,11 @@ Napi::Object GetCurrentResolution(const Napi::CallbackInfo &info)
 
     unsigned int rROutput = info[0].As<Napi::Number>().Int32Value();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(rROutput);
+    std::unique_ptr<OutputResolutionWithOffset> resolution = desktopInfo->GetCurrentResolution(rROutput);
     if (resolution != nullptr)
     {
         std::cout << "current Resolution : " << resolution->width() << "x" << resolution->height() << std::endl;
+        std::cout << "current offset : " << resolution->offsetX() << "x" << resolution->offsetY() << std::endl;
         currentResolution = Napi::Object::New(env);
         currentResolution.Set(Napi::String::New(env, "width"), Napi::Number::New(env, resolution->width()));
         currentResolution.Set(Napi::String::New(env, "height"), Napi::Number::New(env, resolution->height()));
@@ -214,17 +216,71 @@ Napi::Number GetPrimaryRROutput(const Napi::CallbackInfo &info)
     return Napi::Number::New(env, outputIndex);
 }
 
+Napi::Object GetExtendedMonitorResolution(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    Napi::Object extendedResolution;
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    std::unique_ptr<OutputResolution> resolution = desktopInfo->GetExtendedMonitorResolution();
+    if (resolution != nullptr)
+    {
+        // std::cout << "extended Resolution : " << resolution->width() << "x" << resolution->height() << std::endl;
+        extendedResolution = Napi::Object::New(env);
+        extendedResolution.Set(Napi::String::New(env, "width"), Napi::Number::New(env, resolution->width()));
+        extendedResolution.Set(Napi::String::New(env, "height"), Napi::Number::New(env, resolution->height()));
+    }
+    else
+    {
+        Napi::Error::New(env, "Could not get the current resolution of the output. Please Try again.");
+    }
+    return extendedResolution;
+}
+
+Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
+{
+
+    Napi::Env env = info.Env();
+    Napi::Array currentResolutionsArray;
+
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    std::vector<OutputResolutionWithOffset> currentResolutions = desktopInfo->GetAllCurrentResolutions();
+    
+    currentResolutionsArray = Napi::Array::New(env);
+    int i = 0;
+    for (auto resolutionWithOffset : currentResolutions)
+    {
+            Napi::Object outputWithResolution = Napi::Object::New(env);
+            outputWithResolution.Set("rrOutput", resolutionWithOffset.rrOutput());
+            outputWithResolution.Set("offsetX", resolutionWithOffset.offsetX());
+            outputWithResolution.Set("offsetY", resolutionWithOffset.offsetY());
+            outputWithResolution.Set("width", resolutionWithOffset.width());
+            outputWithResolution.Set("height", resolutionWithOffset.height());
+            currentResolutionsArray.Set(i, outputWithResolution);
+            i++;
+    }
+    Napi::Error::New(env, "Could not get the number of outputs of the display. Please try again.");
+    return currentResolutionsArray;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
-    exports.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
-    exports.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
-    exports.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
-    exports.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
-    exports.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
-    exports.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
-    exports.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
-    return exports;
+    Napi::Object displayUtility = Napi::Object::New(env);
+
+    displayUtility.Set(Napi::String::New(env, "getConnectedOutputs"), Napi::Function::New(env, GetConnectedOutputs));
+    displayUtility.Set(Napi::String::New(env, "getOutputName"), Napi::Function::New(env, GetOutputName));
+    displayUtility.Set(Napi::String::New(env, "getCurrentResolution"), Napi::Function::New(env, GetCurrentResolution));
+    displayUtility.Set(Napi::String::New(env, "getResolutions"), Napi::Function::New(env, GetResolutions));
+    displayUtility.Set(Napi::String::New(env, "setResolution"), Napi::Function::New(env, SetResolution));
+    displayUtility.Set(Napi::String::New(env, "makeScreenBlank"), Napi::Function::New(env, MakeScreenBlank));
+    displayUtility.Set(Napi::String::New(env, "reverseBlankScreen"), Napi::Function::New(env, ReverseBlankScreen));
+    displayUtility.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
+    displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
+    displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
+
+    exports.Set("DisplayUtility", displayUtility);
+    
+    return ScreenCaptureUtility::Init(env, exports);
 }
 
 NODE_API_MODULE(desktop_info, Init);

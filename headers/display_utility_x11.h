@@ -1,6 +1,7 @@
 #ifndef REMOTING_HOST_DISPLAY_UTILITY_X11_H_
 #define REMOTING_HOST_DISPLAY_UTILITY_X11_H_
 #include <set>
+#include <vector>
 #include "base_macros.h"
 #include "screen_resources.h"
 
@@ -14,10 +15,12 @@ public:
 
     // DesktopResizer interface
     bool TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs);
-    std::unique_ptr<OutputResolution> GetCurrentResolution(RROutput rROutput);
+    std::unique_ptr<OutputResolutionWithOffset> GetCurrentResolution(RROutput rROutput);
     std::set<OutputResolution> GetResolutions(RROutput rROutput);
     std::string GetOutputName(RROutput rROutput);
     RROutput GetPrimaryRROutput();
+    std::unique_ptr<OutputResolution> GetExtendedMonitorResolution();
+    std::vector<OutputResolutionWithOffset> GetAllCurrentResolutions();
 
 private:
     Display *display_;

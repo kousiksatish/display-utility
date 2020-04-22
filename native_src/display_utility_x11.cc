@@ -67,13 +67,15 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
                 std::cout << "Could not get output info of index: " << outputIndex << std::endl;
                 return false;
             }
-            if (outputInfo->connection == 0)
+            // Crtc is 0 if output is off
+            if (outputInfo->connection == 0 && outputInfo->crtc)
             {
                 tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
                 // Only consider if primary RROutput is in connected state
                 if (currentRROutput == primaryRROutput)
                 {
-                    primaryOutputIndex = outputIndex;
+                    // Use index in tmpOutputs
+                    primaryOutputIndex = numberOfOutputsConnected - 1;
                 }
             }
             XRRFreeOutputInfo(outputInfo);
@@ -95,11 +97,13 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
     return false;
 }
 
-std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
+std::unique_ptr<OutputResolutionWithOffset> DisplayUtilityX11::GetCurrentResolution(RROutput rROutput)
 {
     int height = 0;
     int width = 0;
-    std::unique_ptr<OutputResolution> currentResolution = nullptr;
+    int offsetX = 0;
+    int offsetY = 0;
+    std::unique_ptr<OutputResolutionWithOffset> currentResolution = nullptr;
     if (resources_.Refresh(display_, root_) == false)
     {
         return currentResolution;
@@ -119,14 +123,18 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetCurrentResolution(RROutp
         case RR_Rotate_270:
             width = crtc->height;
             height = crtc->width;
+            offsetX = crtc->y;
+            offsetY = crtc->x;
             break;
         case RR_Rotate_0:
         case RR_Rotate_180:
         default:
             width = crtc->width;
             height = crtc->height;
+            offsetX = crtc->x;
+            offsetY = crtc->y;
         }
-        currentResolution = std::unique_ptr<OutputResolution>(new OutputResolution(width, height, crtc->mode));
+        currentResolution = std::unique_ptr<OutputResolutionWithOffset>(new OutputResolutionWithOffset(width, height, crtc->mode, offsetX, offsetY, rROutput));
         XRRFreeCrtcInfo(crtc);
     }
     XRRFreeOutputInfo(outputInfo);
@@ -154,6 +162,7 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
         XRRFreeCrtcInfo(crtc);
         for (int i = 0; i < outputInfo->nmode; i++)
         {
+            std::cout<<outputInfo->mm_height<<"x"<<outputInfo->mm_width;
             OutputResolution *resolution = resources_.GetResolutionUsingModeId(outputInfo->modes[i], crtc->rotation);
             if (resolution != nullptr && !(*resolution < *minimumDesktopResolution))
             {
@@ -166,6 +175,36 @@ std::set<OutputResolution> DisplayUtilityX11::GetResolutions(RROutput rROutput)
 
     XRRFreeOutputInfo(outputInfo);
     return resolutionsSet;
+}
+
+std::vector<OutputResolutionWithOffset> DisplayUtilityX11::GetAllCurrentResolutions()
+{
+    unsigned int numberOfOutputs = 0;
+    RROutput *connectedOutputs = nullptr;
+
+    std::vector<OutputResolutionWithOffset> currentResolutionsSet;
+
+    if (this->TryGetConnectedOutputs(&numberOfOutputs, &connectedOutputs))
+    {
+        if (connectedOutputs != nullptr)
+        {
+            std::cout << "There are " << numberOfOutputs << " outputs connected to this desktop." << std::endl;
+
+            for (unsigned int i = 0; i < numberOfOutputs; i += 1)
+            {
+                // Get current resolution with offset for each output
+                std::unique_ptr<OutputResolutionWithOffset> resolutionWithOffset = this->GetCurrentResolution(connectedOutputs[i]);
+                OutputResolutionWithOffset* ptr = resolutionWithOffset.release();
+                if (ptr != nullptr)
+                {
+                    currentResolutionsSet.push_back(*ptr);
+                }
+
+                delete ptr;
+            }
+        }
+    }
+    return currentResolutionsSet;
 }
 
 std::string DisplayUtilityX11::GetOutputName(RROutput rROutput)
@@ -202,6 +241,20 @@ RROutput DisplayUtilityX11::GetPrimaryRROutput()
     }
 
     return primaryRROutput;
+}
+
+std::unique_ptr<OutputResolution> DisplayUtilityX11::GetExtendedMonitorResolution()
+{
+    std::unique_ptr<OutputResolution> extendedResolution = nullptr;
+
+    // Get width and height of the complete window
+    XWindowAttributes attributes;
+    XGetWindowAttributes(display_, root_, &attributes);
+
+    // Mode is set as 0 as it is not applicable
+    extendedResolution = std::unique_ptr<OutputResolution>(new OutputResolution(attributes.width, attributes.height, 0));
+
+    return extendedResolution;
 }
 
 } // namespace remoting
