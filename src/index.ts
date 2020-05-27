@@ -134,4 +134,6 @@ interface IScreenCaptureUtility {
      * Force the next frame to be an iframe. Call will also force the next frame and return any waiting getNextFrame callback
      */
     sendNextFrameAsIFrame(): void;
+
+    setCRFValue(crfValue: number): void;
 }
