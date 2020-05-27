@@ -18,56 +18,23 @@ console.log(displayUtility.getExtendedMonitorResolution());
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getAllCurrentResolutionsWithOffset());
 
-async function testScreenCapturer(): Promise<void> {
-    try {
-        fs.writeFileSync('/tmp/output.h264', '');
-        screenCaptureUtility.init(true, 65);
-        let numberOfFrames: number = 100;
-        // tslint:disable-next-line: no-console
-        console.time('fps');
-        console.timeLog('fps');
-        while (numberOfFrames !== 0) {
-            screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
-                writeToFile(frame);
-            });
-            numberOfFrames = numberOfFrames - 1;
-        }
-        // tslint:disable-next-line: no-console
-        console.timeEnd('fps');
-
-        screenCaptureUtility.init(false);
-        numberOfFrames = 100;
-        // tslint:disable-next-line: no-console
-        console.time('fps');
-        console.timeLog('fps');
-        while (numberOfFrames !== 0) {
-            screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
-                writeToFile(frame);
-            });
-            numberOfFrames = numberOfFrames - 1;
-        }
-        // tslint:disable-next-line: no-console
-        console.timeEnd('fps');
-    } catch (err) {
-        // tslint:disable-next-line: no-console
-        console.log(err);
-    }
-}
-
-function writeToFile(input: ArrayBuffer): void {
-    fs.appendFileSync('/tmp/output.h264', new Buffer(input));
-}
-
-// tslint:disable-next-line: no-floating-promises
-// testScreenCapturer();
-
-function testForceFrame(): void {
-
+function testScreenCapture(): void {
+    fs.writeFileSync('/tmp/output.h264', '');
     screenCaptureUtility.init(false);
 
     setInterval(() => {
         screenCaptureUtility.forceNextFrame();
     },          1000);
+
+    // CRF change test
+    setTimeout(() => {
+        try {
+            screenCaptureUtility.setCRFValue(28);
+        } catch (err) {
+            // tslint:disable-next-line: no-console
+            console.log(`Error occured ${err} `);
+        }
+    },         3000);
 
     setTimeout(() => {
         screenCaptureUtility.init(true, 65);
@@ -79,8 +46,9 @@ function processFrame(): void {
     screenCaptureUtility.getNextFrame((frame: ArrayBuffer) => {
         // tslint:disable-next-line: no-console
         console.log(`Received ${frame.byteLength}`);
+        fs.appendFileSync('/tmp/output.h264', new Buffer(frame));
         processFrame();
     });
 }
 
-// testForceFrame();
+// testScreenCapture();
