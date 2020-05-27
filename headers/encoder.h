@@ -21,6 +21,7 @@ public:
     void Init(bool singleMonitorCapture, RROutput rROutput = 0);
     uint8_t *GetNextFrame(int *frameSize);
     void SetForceNextFrame();
+    void SetCRFValue(int crfValue);
     void SendNextFrameAsIFrame();
     ~Encoder();
 

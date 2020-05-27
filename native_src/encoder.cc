@@ -313,6 +313,22 @@ void Encoder::SendNextFrameAsIFrame()
     this->_force_next_frame = true;
 }
 
+void Encoder::SetCRFValue(int crfValue)
+{
+    x264_param_t x264Params;
+    x264_encoder_parameters(_x264Encoder, &x264Params);
+    x264Params.rc.f_rf_constant = crfValue;
+    int returnValue = x264_encoder_reconfig(_x264Encoder, &x264Params);
+    if (returnValue == 0)
+    {
+        std::cout<<"CRF value set as "<<crfValue;
+    } 
+    else 
+    {
+        throw "Reconfigure encoder failed";
+    }
+}
+
 void Encoder::InitXDamage()
 {
     // Check for XDamage extension.
