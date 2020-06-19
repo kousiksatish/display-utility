@@ -12,7 +12,8 @@
     "linux"
   ],
   "cpu": [
-    "x64"
+    "x64",
+    "arm"
   ],
   "main": "release/index.js",
   "scripts": {
