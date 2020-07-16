@@ -1,5 +1,6 @@
+import { EventEmitter } from 'events';
 import fs from 'fs';
-import { displayUtility, lockUtility, screenCaptureUtility } from './index';
+import { displayEventsUtility, displayUtility, lockUtility, screenCaptureUtility } from './index';
 
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getConnectedOutputs());
@@ -84,3 +85,28 @@ function processFrame(): void {
 }
 
 // testForceFrame();
+
+//=========================================================
+
+//const testAddon = require('/home/test/sehgald/napi_addons/Example_12_TsfnScrnRes/build/Release/testaddon.node');
+
+const emitter: EventEmitter = new EventEmitter();
+
+emitter.on('data', (message: string) => {
+        //console.log('event received at node.js side');
+        screenCaptureUtility.init(false);
+});
+
+/*
+setInterval( ()=>{
+    console.log('main thread executing');
+}, 10000);
+*/
+
+displayEventsUtility.createListener(emitter.emit.bind(emitter));
+displayEventsUtility.startListener();
+
+setTimeout(() => {
+    //console.log('closing listener');
+    displayEventsUtility.closeListener();
+},         10000);
