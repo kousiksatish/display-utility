@@ -259,11 +259,11 @@ x264_t *Encoder::OpenEncoder(int width, int height)
     x264Params.i_keyint_max = 5000;
     // x264Params.i_keyint_min = INT32_MAX;
     // x264Params.i_avcintra_class
-    if (_currentCRFValue == -1) {
-        _currentCRFValue = 34; // Default CRF value
+    if (this->_currentCRFValue == -1) {
+        this->_currentCRFValue = 34; // Default CRF value
     }
-    x264Params.rc.f_rf_constant = _currentCRFValue;
-    std::cout<<"CRF set as "<<_currentCRFValue;
+    x264Params.rc.f_rf_constant = this->_currentCRFValue;
+    std::cout<<"CRF set as "<<this->_currentCRFValue;
 
     x264_param_apply_fastfirstpass(&x264Params);
 
@@ -320,7 +320,7 @@ void Encoder::SetCRFValue(int crfValue)
     x264_param_t x264Params;
     x264_encoder_parameters(_x264Encoder, &x264Params);
     x264Params.rc.f_rf_constant = crfValue;
-    _currentCRFValue = crfValue;
+    this->_currentCRFValue = crfValue;
     int returnValue = x264_encoder_reconfig(_x264Encoder, &x264Params);
     if (returnValue == 0)
     {
