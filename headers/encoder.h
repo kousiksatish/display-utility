@@ -46,7 +46,7 @@ private:
     int64_t _i_frame_counter;
     bool _force_next_frame;
     bool _next_frame_as_iframe;
-    bool _currentCRFValue;
+    int _currentCRFValue;
     // void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
     uint8_t *CaptureAndEncode(int *frameSize);
