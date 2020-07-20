@@ -48,12 +48,15 @@ std::unique_ptr<DisplayUtilityX11> DisplayUtilityX11::Create()
 bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RROutput **connectedOutputs)
 {
     unsigned int numberOfOutputsConnected = 0;
+    unsigned int numberOfOutputsDisconnected = 0;
     if (resources_.Refresh(display_, root_))
     {
-        RROutput * tmpOutputs = new RROutput[resources_.get()->noutput];
+        RROutput * tmpConnectedOutputs = new RROutput[resources_.get()->noutput];
+        RROutput * tmpDisconnectedOutputs = new RROutput[resources_.get()->noutput];
         RROutput currentRROutput;
         RROutput primaryRROutput = XRRGetOutputPrimary(display_, root_);
         int primaryOutputIndex = 0;
+        int disconnectedPrimaryOutputIndex = 0;
         for (int outputIndex = 0; outputIndex < resources_.get()->noutput; outputIndex += 1)
         {
             if (resources_.TryGetOutput(outputIndex, &currentRROutput) == false)
@@ -70,12 +73,19 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
             // Crtc is 0 if output is off
             if (outputInfo->connection == 0 && outputInfo->crtc)
             {
-                tmpOutputs[numberOfOutputsConnected++] = currentRROutput;
+                tmpConnectedOutputs[numberOfOutputsConnected++] = currentRROutput;
                 // Only consider if primary RROutput is in connected state
                 if (currentRROutput == primaryRROutput)
                 {
-                    // Use index in tmpOutputs
+                    // Use index in connectedOutputs
                     primaryOutputIndex = numberOfOutputsConnected - 1;
+                }
+            } else if (outputInfo->crtc) {
+                tmpDisconnectedOutputs[numberOfOutputsDisconnected++] = currentRROutput;
+
+                if (currentRROutput == primaryRROutput)
+                {
+                    disconnectedPrimaryOutputIndex = numberOfOutputsDisconnected - 1;
                 }
             }
             XRRFreeOutputInfo(outputInfo);
@@ -85,13 +95,20 @@ bool DisplayUtilityX11::TryGetConnectedOutputs(unsigned int *numberOfOutputs, RR
         if (primaryOutputIndex != 0)
         {
             // Swap primary output to first index
-            RROutput outputAtFirstIndex = tmpOutputs[0];
-            tmpOutputs[0] = tmpOutputs[primaryOutputIndex];
-            tmpOutputs[primaryOutputIndex] = outputAtFirstIndex;
+            RROutput outputAtFirstIndex = tmpConnectedOutputs[0];
+            tmpConnectedOutputs[0] = tmpConnectedOutputs[primaryOutputIndex];
+            tmpConnectedOutputs[primaryOutputIndex] = outputAtFirstIndex;
+        }
+
+        // If no monitor is in connected state, consider one of the disconnected RROutput (preferably primary) as connected for no monitor case capture
+        if (numberOfOutputsConnected == 0 && numberOfOutputsDisconnected != 0) {
+            numberOfOutputsConnected = 1;
+            tmpConnectedOutputs[0] = tmpDisconnectedOutputs[disconnectedPrimaryOutputIndex];
         }
 
         *numberOfOutputs = numberOfOutputsConnected;
-        *connectedOutputs = tmpOutputs;
+        *connectedOutputs = tmpConnectedOutputs;
+        
         return true;
     }
     return false;
