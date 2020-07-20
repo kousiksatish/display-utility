@@ -36,6 +36,7 @@
         "native_src/get_next_frame_worker.cc",
         "native_src/screen_resolution_events_capturer.cc"],
       # To avoid native node modules from throwing cpp exception and raise pending JS exception which can be handled in JS
+      'dependencies': [ "<!(node -p \"require('node-addon-api').gyp\")" ],
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }
   ]

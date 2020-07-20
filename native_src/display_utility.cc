@@ -2,9 +2,8 @@
 #include <iostream>
 #include "../headers/display_utility_x11.h"
 #include "../headers/screen_capture_utility.h"
+#include "../headers/screen_resolution_events_capturer.h"
 using namespace remoting;
-
-extern Napi::Object Init_screenResolutionEventsCapturer(Napi::Env env, Napi::Object exports);
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
 {
@@ -280,9 +279,17 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
     displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
 
-    exports.Set("DisplayUtility", displayUtility);
+    Napi::Object displayEventsUtility = Napi::Object::New(env);
+    displayEventsUtility.Set(Napi::String::New(env, "createListener"), Napi::Function::New(env, CreateListener));
+    displayEventsUtility.Set(Napi::String::New(env, "startListener"), Napi::Function::New(env, StartListener));
+    displayEventsUtility.Set(Napi::String::New(env, "closeListener"), Napi::Function::New(env, CloseListener));
 
-    return ScreenCaptureUtility::Init(env, Init_screenResolutionEventsCapturer(env, exports));
+    exports.Set("DisplayUtility", displayUtility);
+    exports.Set("DisplayEventsUtility", displayEventsUtility);
+    return exports;
+//    Napi::Object exports_1 = ScreenCaptureUtility::Init(env, exports);
+//    return ScreenResolutionEventsCapturer::Init(env, exports_1);
+//    return ScreenCaptureUtility::Init(env, exports);
 }
 
 NODE_API_MODULE(desktop_info, Init);

@@ -1,25 +1,18 @@
+#include "../headers/screen_resolution_events_capturer.h"
 #include "../headers/display_utility_x11.h"
 #include <iostream>
-#include <napi.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/Xrandr.h>
-#include <X11/Xutil.h>
-#include <thread>
+#include <memory>
 #include <chrono>
 
 using namespace Napi;
 using namespace std;
 using namespace remoting;
 
-typedef struct {
-    unsigned int width;
-    unsigned int height;
-}outputResolutionList;
+std::thread nativeThread;
+Napi::ThreadSafeFunction tsfn;
 
 outputResolutionList *list = nullptr;
 unsigned int numMonitors = 0;
-std::thread nativeThread;
-ThreadSafeFunction tsfn;
 bool isClosing = false;
 
 Display *display_ = nullptr;
@@ -27,42 +20,43 @@ Window root_window_;
 int change_event_base_ = 0;
 int change_error_base_ = 0;
 
-bool ProcessPendingXEvents();
-void DeinitXlib();
-bool InitXlib();
-outputResolutionList* getOutputResolutionDetails(unsigned int *n);
-bool checkResolutionChange(char*);
-
 // Napi functions to create, start and close listener
-void CreateListener( const CallbackInfo& info )
+void CreateListener(const Napi::CallbackInfo& info)
 {
-  Env env = info.Env();
-  if ( info.Length() < 1 || !info[0].IsFunction() )
-    throw TypeError::New( env, "Expects a single function type argument" );
+    Napi::Env env = info.Env();
+    if (info.Length() < 1 || !info[0].IsFunction())
+        throw TypeError::New( env, "Expects a single function type argument" );
 
-  tsfn = ThreadSafeFunction::New(
-      env,
-      info[0].As<Function>(),  // JavaScript function called asynchronously
-      "Resource Name",         // Name
-      0,                       // Unlimited queue
-      1,                       // Only one thread will use this initially
-      []( Napi::Env ) {        // Finalizer used to clean threads up
-        nativeThread.join();
-      } );
+    tsfn = ThreadSafeFunction::New(
+        env,
+        info[0].As<Function>(),  // JavaScript function called asynchronously
+        "Resource Name",         // Name
+        0,                       // Unlimited queue
+        1,                       // Only one thread will use this initially
+        []( Napi::Env ) {        // Finalizer used to clean threads up
+            nativeThread.join();
+        } );
 
-  list = getOutputResolutionDetails(&numMonitors);
-  for(unsigned int i=0; i<numMonitors; i++)
-    cout << "monitor " << i << " has resolution " << list[i].width << "x" << list[i].height << endl;
+    list = getOutputResolutionDetails(&numMonitors);
+    for(unsigned int i=0; i<numMonitors; i++)
+        cout << "monitor " << i << " has resolution " << list[i].width << "x" << list[i].height << endl;
 };
 
-void StartListener(const CallbackInfo& info)
+void StartListener(const Napi::CallbackInfo& info)
 {
-    InitXlib();
+   InitXlib();
 
     nativeThread = std::thread( [] {
-        auto callback = []( Env env, Function jsCallback, char* message) {
-            jsCallback.Call( {String::New( env, "data" ), String::New( env, message )} );
-            delete[] message;
+        auto callback = [] (Napi::Env env, Function jsCallback, char* message) {
+            String res = String::New(env, message);
+            cout << "in cb:" << res.Utf8Value() << "," << message << endl;
+            //jsCallback.Call( {String::New( env, "data" ), String::New( env, message )} );
+            jsCallback.Call( {String::New( env, "data" ), res} );
+            if (message)
+            {
+                delete[] message;
+                message = NULL;
+            }
         };
 
         while(!isClosing)
@@ -84,40 +78,27 @@ void StartListener(const CallbackInfo& info)
     } );
 }
 
-Value CloseListener(const CallbackInfo& info)
+void CloseListener(const Napi::CallbackInfo& info)
 {
-    Env env = info.Env();
     cout << "Close Listener called\n";
     isClosing = true;
+
     if (list != nullptr)
     {
         delete[] list;
         list = nullptr;
     }
+
     DeinitXlib();
     if (napi_ok != tsfn.Release())
         cout << "Error on releasing thread-safe function\n";
-    return Boolean::New(env, true);
 }
-
-Object Init_screenResolutionEventsCapturer( Env env, Object exports )
-{
-  Object displayEventsUtility = Object::New (env);
-  displayEventsUtility.Set("createListener" , Function::New(env, CreateListener));
-  displayEventsUtility.Set("startListener" ,  Function::New(env, StartListener));
-  displayEventsUtility.Set("closeListener" ,  Function::New(env, CloseListener));
-
-  exports.Set("DisplayEventsUtility", displayEventsUtility);
-  return exports;
-}
-
-//NODE_API_MODULE( displayEventsUtility, Init )
 
 // Xrandr related functions to handle events for screen resolution change
 
 bool InitXlib()
 {
-    display_ = XOpenDisplay(NULL);
+   display_ = XOpenDisplay(NULL);
     if (!display_)
     {   
         cout << "Unable to open display" << endl;
@@ -176,17 +157,17 @@ outputResolutionList* getOutputResolutionDetails(unsigned int *n)
     unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
     desktopInfo->TryGetConnectedOutputs(n, &o);
 
-    outputResolutionList *list = new outputResolutionList[*n];
+    outputResolutionList *tmpList = new outputResolutionList[*n];
     for(unsigned int i=0; i<*n; i++)
     {
         unique_ptr<OutputResolutionWithOffset> resolution = desktopInfo->GetCurrentResolution(o[i]);
         //unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(o[i]);
-        list[i].width = resolution->width();
-        list[i].height = resolution->height();
+        tmpList[i].width = resolution->width();
+        tmpList[i].height = resolution->height();
     }   
 
     delete[] o;
-    return list;
+    return tmpList;
 }
 
 // currently, it is assumed that only one output's resolution can change at one time
@@ -195,6 +176,7 @@ bool checkResolutionChange(char *message)
     bool flag = false;
     unsigned int n = 0, i = 0;
     outputResolutionList *newResolutionList = getOutputResolutionDetails(&n);
+
     for(; i<n; i++)
     {   
         if (list[i].width != newResolutionList[i].width || list[i].height != newResolutionList[i].height)
@@ -212,7 +194,7 @@ bool checkResolutionChange(char *message)
 
     for(unsigned int i=0; i<n; i++)
         cout << "monitor " << i << " has resolution " << list[i].width << "x" << list[i].height << endl;
-    
+
     delete[] newResolutionList;
     return flag;
 }

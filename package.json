@@ -15,6 +15,7 @@
     "x64"
   ],
   "main": "release/index.js",
+  "gypfile": true,
   "scripts": {
     "transpile": "tsc --build tsconfig.json",
     "lint": "tslint --project tsconfig.json --config tslint.json --fix",
@@ -58,12 +59,13 @@
     "lint-staged": "^8.2.1",
     "tslint": "^5.18.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "node-gyp": "^3.8.0"
   },
   "dependencies": {
     "bindings": "^1.5.0",
     "lock-system": "^2.0.0",
-    "node-addon-api": "^1.7.1"
+    "node-addon-api": "^1.7.2"
   },
   "files": [
     "headers",

@@ -153,5 +153,5 @@ interface IDisplayEventsUtility {
     /**
      * Stops the resolution monitoring process and releases tsfn
      */
-    closeListener(): boolean;
+    closeListener(): void;
 }

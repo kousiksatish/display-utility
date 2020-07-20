@@ -1,24 +1,27 @@
 import { EventEmitter } from 'events';
+//const EventEmitter = require('events').EventEmitter;
 import fs from 'fs';
-import { displayEventsUtility, displayUtility, lockUtility, screenCaptureUtility } from './index';
+//import { displayEventsUtility, displayUtility, lockUtility, screenCaptureUtility } from './index';
+import { displayEventsUtility } from './index';
+//import { displayUtility, lockUtility, screenCaptureUtility } from './index';
 
 // tslint:disable-next-line:no-console
-console.log(displayUtility.getConnectedOutputs());
+//--console.log(displayUtility.getConnectedOutputs());
 // lockUtility.lockScreen();
 
 // tslint:disable-next-line:no-console
-console.log(displayUtility.getPrimaryRROutput());
+//--console.log(displayUtility.getPrimaryRROutput());
 // displayUtility.setResolution(65, {
 //     width: 1440,
 //     height: 900
 // });
 
 // tslint:disable-next-line:no-console
-console.log(displayUtility.getExtendedMonitorResolution());
+//--console.log(displayUtility.getExtendedMonitorResolution());
 
 // tslint:disable-next-line:no-console
-console.log(displayUtility.getAllCurrentResolutionsWithOffset());
-
+//--console.log(displayUtility.getAllCurrentResolutionsWithOffset());
+/*
 async function testScreenCapturer(): Promise<void> {
     try {
         fs.writeFileSync('/tmp/output.h264', '');
@@ -85,16 +88,18 @@ function processFrame(): void {
 }
 
 // testForceFrame();
-
+*/
 //=========================================================
 
-//const testAddon = require('/home/test/sehgald/napi_addons/Example_12_TsfnScrnRes/build/Release/testaddon.node');
+//constdisplayEventsUtility=require('/home/kousik/code/sehgald/napi_addons/Example_12_TsfnScrnRes/build/Release/displayEventsUtility.node');
 
 const emitter: EventEmitter = new EventEmitter();
+//const emitter = new EventEmitter();
 
 emitter.on('data', (message: string) => {
-        //console.log('event received at node.js side');
-        screenCaptureUtility.init(false);
+        // tslint:disable-next-line: no-console
+        console.log('event received at node.js side');
+//        screenCaptureUtility.init(false);
 });
 
 /*
@@ -107,6 +112,8 @@ displayEventsUtility.createListener(emitter.emit.bind(emitter));
 displayEventsUtility.startListener();
 
 setTimeout(() => {
-    //console.log('closing listener');
+    // tslint:disable-next-line: no-console
+    console.log('closing listener');
+    // tslint:disable-next-line: no-console
     displayEventsUtility.closeListener();
-},         10000);
+},         5000);
