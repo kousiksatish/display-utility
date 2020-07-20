@@ -26,7 +26,7 @@ ScreenCaptureUtility::ScreenCaptureUtility(const Napi::CallbackInfo &info) : Nap
     Napi::Env env = info.Env();
     Napi::HandleScope scope(env);
 
-    this->_encoder = new Encoder();
+    this->_encoder = nullptr;
 }
 
 void ScreenCaptureUtility::Init(const Napi::CallbackInfo &info)
@@ -48,11 +48,13 @@ void ScreenCaptureUtility::Init(const Napi::CallbackInfo &info)
             else
             {
                 unsigned int rROutput = info[1].As<Napi::Number>().Int32Value();
+                this->encoder = new Encoder();
                 this->_encoder->Init(singleMonitorCapture, rROutput);
             }
         }
         else
         {
+            this->encoder = new Encoder();
             this->_encoder->Init(singleMonitorCapture);
         }
     }
