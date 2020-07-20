@@ -48,13 +48,13 @@ void ScreenCaptureUtility::Init(const Napi::CallbackInfo &info)
             else
             {
                 unsigned int rROutput = info[1].As<Napi::Number>().Int32Value();
-                this->encoder = new Encoder();
+                this->_encoder = new Encoder();
                 this->_encoder->Init(singleMonitorCapture, rROutput);
             }
         }
         else
         {
-            this->encoder = new Encoder();
+            this->_encoder = new Encoder();
             this->_encoder->Init(singleMonitorCapture);
         }
     }

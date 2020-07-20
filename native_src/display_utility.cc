@@ -286,10 +286,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
 
     exports.Set("DisplayUtility", displayUtility);
     exports.Set("DisplayEventsUtility", displayEventsUtility);
-    return exports;
-//    Napi::Object exports_1 = ScreenCaptureUtility::Init(env, exports);
-//    return ScreenResolutionEventsCapturer::Init(env, exports_1);
-//    return ScreenCaptureUtility::Init(env, exports);
+    return ScreenCaptureUtility::Init(env, exports);
 }
 
 NODE_API_MODULE(desktop_info, Init);
