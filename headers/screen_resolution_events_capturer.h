@@ -10,6 +10,7 @@
 typedef struct {
     unsigned int width;
     unsigned int height;
+    RROutput rrOutput;
 }outputResolutionList;
 
 
@@ -20,6 +21,7 @@ void CloseListener (const Napi::CallbackInfo& info);
 bool ProcessPendingXEvents();
 void DeinitXlib();
 bool InitXlib();
+bool checkPrimaryMonitorChange();
 bool checkResolutionChange(char*);
 outputResolutionList* getOutputResolutionDetails(unsigned int *n);
 

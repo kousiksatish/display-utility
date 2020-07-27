@@ -51,7 +51,7 @@ void StartListener(const Napi::CallbackInfo& info)
             String res = String::New(env, message);
             cout << "in cb:" << res.Utf8Value() << "," << message << endl;
             //jsCallback.Call( {String::New( env, "data" ), String::New( env, message )} );
-            jsCallback.Call( {String::New( env, "data" ), res} );
+            jsCallback.Call( {String::New( env, "resolution-data" ), res} );
             if (message)
             {
                 delete[] message;
@@ -59,12 +59,19 @@ void StartListener(const Napi::CallbackInfo& info)
             }
         };
 
+        auto callback_2 = [] (Napi::Env env, Function jsCallback) {
+            jsCallback.Call( {String::New( env, "primary-monitor-change" )} );
+        };
+
         while(!isClosing)
         {
             if (ProcessPendingXEvents())
             {
                 //std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
-                char *message = new char[20];
+                if (checkPrimaryMonitorChange())
+                    tsfn.NonBlockingCall( callback_2 );
+
+                char *message = new char[50]{0};
                 if (checkResolutionChange(message))
                 {
                     napi_status status = tsfn.NonBlockingCall( message, callback );
@@ -72,7 +79,14 @@ void StartListener(const Napi::CallbackInfo& info)
                        cout << "Screen resolution changed but got error at C++ in calling node event: " << status << endl;
                 }
                 else
+                {
                     cout << "Resolution is same as before, not doing any operation\n";
+                    if (message)
+                    {
+                        delete[] message;
+                        message = NULL;
+                    }
+                }
             }
         }
     } );
@@ -161,13 +175,37 @@ outputResolutionList* getOutputResolutionDetails(unsigned int *n)
     for(unsigned int i=0; i<*n; i++)
     {
         unique_ptr<OutputResolutionWithOffset> resolution = desktopInfo->GetCurrentResolution(o[i]);
-        //unique_ptr<OutputResolution> resolution = desktopInfo->GetCurrentResolution(o[i]);
         tmpList[i].width = resolution->width();
         tmpList[i].height = resolution->height();
+        tmpList[i].rrOutput = resolution->rrOutput();
     }   
 
     delete[] o;
     return tmpList;
+}
+
+bool checkPrimaryMonitorChange()
+{
+    unsigned int n = 0;
+    outputResolutionList *newResolutionList = getOutputResolutionDetails(&n);
+    if (list[0].rrOutput != newResolutionList[0].rrOutput)
+    {
+        cout << "primary monitor is changed\n";
+
+        for(unsigned int i=1;i<n;i++)
+        {
+            if (list[i].rrOutput != newResolutionList[i].rrOutput)
+            {
+                outputResolutionList tmp = list[0];
+                list[0] = list[i];
+                list[i] = tmp;
+                delete[] newResolutionList;
+                return true;
+            }
+        }
+    }
+    delete[] newResolutionList;
+    return false;
 }
 
 // currently, it is assumed that only one output's resolution can change at one time
@@ -182,19 +220,18 @@ bool checkResolutionChange(char *message)
         if (list[i].width != newResolutionList[i].width || list[i].height != newResolutionList[i].height)
         {
             flag = true;
-            break;
+            list[i]= newResolutionList[i];
+            char temp[20];
+            sprintf(temp, "%u*%u*0*%u,",list[i].width, list[i].height,i+1);
+            strcat(message, temp);
         }
-    }   
-
-    if (flag)
-    {   
-        list[i]= newResolutionList[i];
-        sprintf(message,"%u*%u*0*%u",list[i].width, list[i].height,i+1);
     }   
 
     for(unsigned int i=0; i<n; i++)
         cout << "monitor " << i << " has resolution " << list[i].width << "x" << list[i].height << endl;
 
+    // remove the trailing comma
+    message[strlen(message)-1] = 0;
     delete[] newResolutionList;
     return flag;
 }
