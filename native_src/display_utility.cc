@@ -263,6 +263,15 @@ Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
     return currentResolutionsArray;
 }
 
+Napi::Boolean IsDisplayAvailable(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (XOpenDisplay(nullptr) == NULL)
+        return Napi::Boolean::New(env, false);
+    else
+        return Napi::Boolean::New(env, true);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Object displayUtility = Napi::Object::New(env);
@@ -277,6 +286,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "getPrimaryRROutput"), Napi::Function::New(env, GetPrimaryRROutput));
     displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
     displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
+    displayUtility.Set(Napi::String::New(env, "isDisplayAvailable"), Napi::Function::New(env, IsDisplayAvailable));
 
     exports.Set("DisplayUtility", displayUtility);
     
