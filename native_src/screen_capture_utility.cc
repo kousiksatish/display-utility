@@ -11,7 +11,8 @@ Napi::Object ScreenCaptureUtility::Init(Napi::Env env, Napi::Object exports)
         InstanceMethod("init", &ScreenCaptureUtility::Init), 
         InstanceMethod("getNextFrame", &ScreenCaptureUtility::GetNextFrame),
         InstanceMethod("forceNextFrame", &ScreenCaptureUtility::ForceNextFrame),
-        InstanceMethod("sendNextFrameAsIFrame", &ScreenCaptureUtility::SendNextFrameAsIFrame)
+        InstanceMethod("sendNextFrameAsIFrame", &ScreenCaptureUtility::SendNextFrameAsIFrame),
+        InstanceMethod("setCRFValue", &ScreenCaptureUtility::SetCRFValue)
     });
 
     constructor = Napi::Persistent(func);
@@ -107,6 +108,24 @@ void ScreenCaptureUtility::ForceNextFrame(const Napi::CallbackInfo &info)
 void ScreenCaptureUtility::SendNextFrameAsIFrame(const Napi::CallbackInfo &info)
 {
     this->_encoder->SendNextFrameAsIFrame();
+}
+
+void ScreenCaptureUtility::SetCRFValue(const Napi::CallbackInfo &info)
+{
+    try
+    {
+        if (info.Length() < 1 || !info[0].IsNumber())
+        {
+            throw "Invalid arguments";
+        }
+        unsigned int crfValue = info[0].As<Napi::Number>().Int32Value();
+        this->_encoder->SetCRFValue(crfValue);
+    }
+    catch (const char *message)
+    {
+        Napi::Error::New(info.Env(), message).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 ScreenCaptureUtility::~ScreenCaptureUtility()

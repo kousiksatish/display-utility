@@ -21,6 +21,7 @@ private:
     void Init(const Napi::CallbackInfo &info);
     void ForceNextFrame(const Napi::CallbackInfo &info);
     void SendNextFrameAsIFrame(const Napi::CallbackInfo &info);
+    void SetCRFValue(const Napi::CallbackInfo &info);
 
     Encoder *_encoder;
     GetNextFrameWorker *_worker;
