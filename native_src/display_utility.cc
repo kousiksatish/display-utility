@@ -266,10 +266,13 @@ Napi::Object GetAllCurrentResolutions(const Napi::CallbackInfo &info)
 Napi::Boolean IsDisplayAvailable(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    if (XOpenDisplay(nullptr) == NULL)
+    Display *display = XOpenDisplay(nullptr);
+    if (display == NULL)
         return Napi::Boolean::New(env, false);
-    else
+    else {
+        XCloseDisplay(display);
         return Napi::Boolean::New(env, true);
+    }
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
