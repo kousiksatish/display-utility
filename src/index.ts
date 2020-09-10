@@ -97,6 +97,11 @@ interface INativeDisplayUtility {
      * Get the position (x-offset and y-offset), height and width of connected monitors
      */
     getAllCurrentResolutionsWithOffset(): IResolutionWithOffset[] | undefined;
+
+    /**
+     * Returns true if the display is accessible else false
+     */
+    isDisplayAvailable(): boolean;
 }
 
 interface ILockUtility {
