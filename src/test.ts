@@ -1,5 +1,6 @@
+import { EventEmitter } from 'events';
 import fs from 'fs';
-import { displayUtility, lockUtility, screenCaptureUtility } from './index';
+import { displayEventsUtility, displayUtility, lockUtility, screenCaptureUtility } from './index';
 
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getConnectedOutputs());
@@ -101,3 +102,33 @@ function testScreenCaptureCrfValue(): void {
 // testScreenCapturer();
 // testForceFrame();
 // testScreenCaptureCrfValue();
+
+function testScreenResEvents(): void {
+    const emitter: EventEmitter = new EventEmitter();
+    //const emitter = new EventEmitter();
+
+    emitter.on('data', (message: string) => {
+            // tslint:disable-next-line: no-console
+            console.log('event received at node.js side');
+    //        screenCaptureUtility.init(false);
+    });
+
+    /*
+    setInterval( ()=>{
+        console.log('main thread executing');
+    }, 10000);
+    */
+
+    displayEventsUtility.createListener(emitter.emit.bind(emitter));
+    displayEventsUtility.startListener();
+
+    setTimeout(() => {
+        // tslint:disable-next-line: no-console
+        console.log('closing listener');
+        // tslint:disable-next-line: no-console
+        displayEventsUtility.closeListener();
+    },         5000);
+
+}
+
+// testScreenResEvents():
