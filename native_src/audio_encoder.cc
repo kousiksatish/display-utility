@@ -15,25 +15,27 @@ AudioEncoder::AudioEncoder()
     src_data = NULL;
     dst_data = NULL;
 
-        int err, ret;
-
     // Capturing related
     frames = 1024;
 
     // Resampling related
     src_nb_samples = frames;
-    dst_nb_samples;
 
+    
+}
+
+void AudioEncoder::init()
+{
     // Encoding related
     float_t** aud_samples;
     int src_samples_linesize;
     int src_channels = 2;
 
     // Initialization
-    err = init_capturer(&handle, frames, &buffer, &size);
+    init_capturer(&handle, frames, &buffer, &size);
     init_resampler(&swr_ctx, &src_nb_samples, &src_data, &dst_nb_samples, &dst_data);
     initialize_encoding_audio("result.mp4");
-    ret = av_samples_alloc_array_and_samples((uint8_t***)&aud_samples, &src_samples_linesize, src_channels,
+    av_samples_alloc_array_and_samples((uint8_t***)&aud_samples, &src_samples_linesize, src_channels,
                                              src_nb_samples,           AV_SAMPLE_FMT_FLTP,    0);
 }
 

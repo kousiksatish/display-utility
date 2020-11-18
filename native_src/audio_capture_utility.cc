@@ -29,6 +29,7 @@ AudioCaptureUtility::AudioCaptureUtility(const Napi::CallbackInfo &info) : Napi:
 
 void AudioCaptureUtility::Init(const Napi::CallbackInfo &info)
 {
+    this->_encoder->init();
     return;
 }
 

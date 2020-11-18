@@ -43,6 +43,7 @@ class AudioEncoder
     public:
         AudioEncoder();
         ~AudioEncoder();
+        void init();
         uint8_t *GetNextFrame(int *frameSize);
 
     private:

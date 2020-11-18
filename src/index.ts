@@ -147,5 +147,6 @@ interface IScreenCaptureUtility {
 }
 
 interface IAudioCaptureUtility {
+    init(): void;
     getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void;
 }

@@ -48,6 +48,7 @@ console.log(displayUtility.getAllCurrentResolutionsWithOffset());
 // }
 
 function testAudioCapture(): void {
+    audioCaptureUtility.init();
     processAudioFrame();
 }
 
