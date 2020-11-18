@@ -14,7 +14,10 @@ export const displayUtility: INativeDisplayUtility = addon.DisplayUtility;
 
 // Creating and exporting persistent object for screen capture utility
 // tslint:disable-next-line: no-unsafe-any
-export const screenCaptureUtility: IScreenCaptureUtility = new addon.ScreenCaptureUtility();
+// export const screenCaptureUtility: IScreenCaptureUtility = new addon.ScreenCaptureUtility();
+
+// tslint:disable-next-line: no-unsafe-any
+export const audioCaptureUtility: IAudioCaptureUtility = new addon.AudioCaptureUtility();
 
 export const lockUtility: ILockUtility = {
     lockScreen: lockSystem
@@ -141,4 +144,8 @@ interface IScreenCaptureUtility {
     sendNextFrameAsIFrame(): void;
 
     setCRFValue(crfValue: number): void;
+}
+
+interface IAudioCaptureUtility {
+    getNextFrame(callback: (nextFrame: ArrayBuffer) => void): void;
 }

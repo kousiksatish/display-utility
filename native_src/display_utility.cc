@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../headers/display_utility_x11.h"
 #include "../headers/screen_capture_utility.h"
+#include "../headers/audio_capture_utility.h"
 using namespace remoting;
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
@@ -293,7 +294,6 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
 
     exports.Set("DisplayUtility", displayUtility);
     
-    return ScreenCaptureUtility::Init(env, exports);
+    return AudioCaptureUtility::Init(env, exports);
 }
-
 NODE_API_MODULE(desktop_info, Init);

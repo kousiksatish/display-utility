@@ -17,6 +17,11 @@
           "-lXtst", # provided by libxtst-dev
           "-lXdamage",
           "-lXfixes",
+          "-lasound", # provided by libx11-dev
+          "-lavformat", # provided by libxrandr-dev
+          "-lavcodec", # provided by libxtst-dev
+          "-lavutil",
+          "-lswresample",
           "<@(x264_root)/lib/libx264.a" # static library exported with the package
         ]
       },
@@ -33,7 +38,11 @@
         "native_src/base_screen_capturer.cc",
         "native_src/single_screen_capturer.cc",
         "native_src/multi_screen_capturer.cc",
-        "native_src/get_next_frame_worker.cc"],
+        "native_src/get_next_frame_worker.cc",
+        "native_src/audio_capture_utility.cc",
+        "native_src/audio_encoder.cc",
+        "native_src/get_next_audio_frame_worker.cc"
+        ],
       # To avoid native node modules from throwing cpp exception and raise pending JS exception which can be handled in JS
       "defines": [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }
