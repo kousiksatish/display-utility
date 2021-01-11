@@ -17,6 +17,7 @@
           "-lXtst", # provided by libxtst-dev
           "-lXdamage",
           "-lXfixes",
+          "-lswscale",
           "<@(x264_root)/lib/libx264.a" # static library exported with the package
         ]
       },

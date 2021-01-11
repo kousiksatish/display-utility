@@ -7,6 +7,7 @@ extern "C"
 #include <X11/Xutil.h>
 #include "../x264/headers/x264.h"
 #include <X11/extensions/Xdamage.h>
+#include <libswscale/swscale.h>
 }
 #include "base_screen_capturer.h"
 #include "single_screen_capturer.h"
@@ -31,11 +32,15 @@ private:
     Window _window;
     BaseScreenCapturer *_screenCapturer;
     uint8_t *_rgbData;
+    uint8_t *_rgbPlanes[3];
+    int _rgbStride[3];
 
     // Encoder properties
     x264_t *_x264Encoder;
-    // SwsContext *_swsConverter;
+    SwsContext *_swsConverter;
     uint8_t *_yuvData;
+    uint8_t *_yuvPlanes[3];
+    int _yuvStride[3];
     bool _isInitialised;
     x264_picture_t _inputPic;
     x264_picture_t _outputPic;
@@ -47,7 +52,7 @@ private:
     bool _force_next_frame;
     bool _next_frame_as_iframe;
     int _currentCRFValue;
-    // void InitializeConverter(int width, int height);
+    void InitializeConverter(int width, int height);
     x264_t *OpenEncoder(int width, int height);
     uint8_t *CaptureAndEncode(int *frameSize);
     void CleanUp();
