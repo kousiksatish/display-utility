@@ -53,25 +53,28 @@ void Encoder::Init(bool singleMonitorCapture, RROutput rROutput)
     _rgbStride[1] = 0;
     _rgbStride[2] = 0;
 
+    _outWidth = _width/2;
+    _outHeight = _height/2;
+
     // YUV output information
-    _yuvData = new uint8_t[3 * _width * _height / 2];
+    _yuvData = new uint8_t[3 * _outWidth * _outHeight / 2];
     _yuvPlanes[0] = _yuvData;
-    _yuvPlanes[1] = _yuvData + _width * _height;
-    _yuvPlanes[2] = _yuvData + _width * _height + _width * _height / 4;
-    _yuvStride[0] = _width;
-    _yuvStride[1] = _width / 2;
-    _yuvStride[2] = _width / 2;
+    _yuvPlanes[1] = _yuvData + _outWidth * _outHeight;
+    _yuvPlanes[2] = _yuvData + _outWidth * _outHeight + _outWidth * _outHeight / 4;
+    _yuvStride[0] = _outWidth;
+    _yuvStride[1] = _outWidth / 2;
+    _yuvStride[2] = _outWidth / 2;
 
     try
     {
         // Initialise x264 encoder
-        _x264Encoder = OpenEncoder(_width, _height);
+        _x264Encoder = OpenEncoder(_outWidth, _outHeight);
     }
     catch (const char *msg)
     {
         throw "ERROR: x264 Encoder initialisation failed. " + std::string(msg);
     }
-    InitializeConverter(_width, _height);
+    InitializeConverter(_width, _height, _outWidth, _outHeight);
 
     InitXDamage();
 
@@ -121,10 +124,10 @@ void Bitmap2Yuv420p_calc2(uint8_t *destination, uint8_t *rgb, size_t width, size
     }
 }
 
-void Encoder::InitializeConverter(int W, int H)
+void Encoder::InitializeConverter(int W, int H, int outW, int outH)
 {
     // Initialise swscale converter
-    _swsConverter = sws_getContext(W, H, AV_PIX_FMT_BGRA, W, H, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
+    _swsConverter = sws_getContext(W, H, AV_PIX_FMT_BGRA, outW, outH, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
     if (_swsConverter == NULL)
     {
         throw "Could not create scaling context.";
@@ -186,7 +189,7 @@ uint8_t *Encoder::CaptureAndEncode(int *frame_size) {
     }
 
     int returnValue = sws_scale(_swsConverter, _rgbPlanes, _rgbStride, 0, _height, _yuvPlanes, _yuvStride);
-    if (returnValue == _height)
+    if (returnValue == _outHeight)
     {
         std::cout << "Converted the color space of the image." << std::endl;
     }
@@ -205,7 +208,7 @@ uint8_t *Encoder::CaptureAndEncode(int *frame_size) {
     //     throw "ERROR: RGB to YUV conversion failed. " + std::string(msg);
     // }
 
-    int luma_size = _width * _height;
+    int luma_size = _outWidth * _outHeight;
     int chroma_size = luma_size / 4;
 
     _inputPic.img.plane[0] = _yuvData;

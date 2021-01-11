@@ -48,11 +48,13 @@ private:
     int _noOfNal;
     int _width;
     int _height;
+    int _outWidth;
+    int _outHeight;
     int64_t _i_frame_counter;
     bool _force_next_frame;
     bool _next_frame_as_iframe;
     int _currentCRFValue;
-    void InitializeConverter(int width, int height);
+    void InitializeConverter(int width, int height, int outWidth, int outHeight);
     x264_t *OpenEncoder(int width, int height);
     uint8_t *CaptureAndEncode(int *frameSize);
     void CleanUp();
