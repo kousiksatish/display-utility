@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../headers/display_utility_x11.h"
 #include "../headers/screen_capture_utility.h"
+#include "../headers/screen_resolution_events_capturer.h"
 using namespace remoting;
 
 Napi::Array GetConnectedOutputs(const Napi::CallbackInfo &info)
@@ -291,8 +292,13 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
     displayUtility.Set(Napi::String::New(env, "isDisplayAvailable"), Napi::Function::New(env, IsDisplayAvailable));
 
+    Napi::Object displayEventsUtility = Napi::Object::New(env);
+    displayEventsUtility.Set(Napi::String::New(env, "createListener"), Napi::Function::New(env, CreateListener));
+    displayEventsUtility.Set(Napi::String::New(env, "startListener"), Napi::Function::New(env, StartListener));
+    displayEventsUtility.Set(Napi::String::New(env, "closeListener"), Napi::Function::New(env, CloseListener));
+
     exports.Set("DisplayUtility", displayUtility);
-    
+    exports.Set("DisplayEventsUtility", displayEventsUtility);
     return ScreenCaptureUtility::Init(env, exports);
 }
 

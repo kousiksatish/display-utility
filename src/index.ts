@@ -12,6 +12,9 @@ const addon: any = bindings('display-utility');
 // tslint:disable-next-line: no-unsafe-any
 export const displayUtility: INativeDisplayUtility = addon.DisplayUtility;
 
+// tslint:disable-next-line: no-unsafe-any
+export const displayEventsUtility: IDisplayEventsUtility = addon.DisplayEventsUtility;
+
 // Creating and exporting persistent object for screen capture utility
 // tslint:disable-next-line: no-unsafe-any
 export const screenCaptureUtility: IScreenCaptureUtility = new addon.ScreenCaptureUtility();
@@ -141,4 +144,21 @@ interface IScreenCaptureUtility {
     sendNextFrameAsIFrame(): void;
 
     setCRFValue(crfValue: number): void;
+}
+
+interface IDisplayEventsUtility {
+    /**
+     * Takes a function (an emitter function) and defines a thread-safe function for C++ to pass events to node.js
+     */
+    createListener(func: Function): void;
+
+    /**
+     * Monitors resolution changes, and places a non-blocking call of the tsfn created whenever it detects resolution change
+     */
+    startListener(): void;
+
+    /**
+     * Stops the resolution monitoring process and releases tsfn
+     */
+    closeListener(): void;
 }
