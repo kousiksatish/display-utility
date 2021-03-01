@@ -257,4 +257,12 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetExtendedMonitorResolutio
     return extendedResolution;
 }
 
+void DisplayUtilityX11::UnicodeTap(const char* unicode) {
+    KeySym sym = XStringToKeysym(unicode);
+    KeyCode code = XKeysymToKeycode(display_,sym);
+
+    XTestFakeKeyEvent(display_, code, True, 1);
+    XTestFakeKeyEvent(display_, code, False, 1);
+}
+
 } // namespace remoting

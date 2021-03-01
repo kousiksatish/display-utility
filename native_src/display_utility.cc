@@ -276,6 +276,20 @@ Napi::Boolean IsDisplayAvailable(const Napi::CallbackInfo &info)
     }
 }
 
+void UnicodeTap(const Napi::CallbackInfo &info)
+{
+    if (info.Length() < 1)
+    {
+        Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
+        return resolutionArray;
+    }
+
+    Napi::Env env = info.Env();
+    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
+    
+    desktopInfo->UnicodeTap(info[0].As<Napi::Number>().ToString());
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Object displayUtility = Napi::Object::New(env);
@@ -291,6 +305,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     displayUtility.Set(Napi::String::New(env, "getExtendedMonitorResolution"), Napi::Function::New(env, GetExtendedMonitorResolution));
     displayUtility.Set(Napi::String::New(env, "getAllCurrentResolutionsWithOffset"), Napi::Function::New(env, GetAllCurrentResolutions));
     displayUtility.Set(Napi::String::New(env, "isDisplayAvailable"), Napi::Function::New(env, IsDisplayAvailable));
+    displayUtility.Set(Napi::String::New(env, "unicodeTap"), Napi::Function::New(env, UnicodeTap));
 
     Napi::Object displayEventsUtility = Napi::Object::New(env);
     displayEventsUtility.Set(Napi::String::New(env, "createListener"), Napi::Function::New(env, CreateListener));
