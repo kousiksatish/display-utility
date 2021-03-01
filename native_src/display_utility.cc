@@ -278,16 +278,15 @@ Napi::Boolean IsDisplayAvailable(const Napi::CallbackInfo &info)
 
 void UnicodeTap(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (info.Length() < 1)
     {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
-        return resolutionArray;
+        return;
     }
-
-    Napi::Env env = info.Env();
     std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
-    
-    desktopInfo->UnicodeTap(info[0].As<Napi::Number>().ToString());
+
+    desktopInfo->UnicodeTap(info[0].As<Napi::String>().Utf8Value().c_str());
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)

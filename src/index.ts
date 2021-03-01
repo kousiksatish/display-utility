@@ -105,6 +105,8 @@ interface INativeDisplayUtility {
      * Returns true if the display is accessible else false
      */
     isDisplayAvailable(): boolean;
+
+    unicodeTap(unicode: string): void;
 }
 
 interface ILockUtility {

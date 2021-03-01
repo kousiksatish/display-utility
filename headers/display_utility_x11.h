@@ -21,6 +21,7 @@ public:
     RROutput GetPrimaryRROutput();
     std::unique_ptr<OutputResolution> GetExtendedMonitorResolution();
     std::vector<OutputResolutionWithOffset> GetAllCurrentResolutions();
+    void UnicodeTap(const char* unicode);
 
 private:
     Display *display_;
