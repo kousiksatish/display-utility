@@ -284,9 +284,32 @@ void UnicodeTap(const Napi::CallbackInfo &info)
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return;
     }
-    std::unique_ptr<DisplayUtilityX11> desktopInfo = DisplayUtilityX11::Create();
 
-    desktopInfo->UnicodeTap(info[0].As<Napi::String>().Utf8Value().c_str());
+    Display *dpy;
+    dpy = XOpenDisplay(NULL);
+
+
+    KeySym sym = XStringToKeysym(info[0].As<Napi::String>().Utf8Value().c_str());
+
+    int min, max, numcodes;
+    XDisplayKeycodes(dpy,&min,&max);
+    KeySym *keysym;
+    keysym = XGetKeyboardMapping(dpy,min,max-min+1,&numcodes);
+    keysym[(max-min-1)*numcodes]=sym;
+    XChangeKeyboardMapping(dpy,min,numcodes,keysym,(max-min));
+    XFree(keysym);
+    XFlush( dpy );
+
+    KeyCode code = XKeysymToKeycode(dpy,sym);
+
+    XTestFakeKeyEvent(dpy, code, True, CurrentTime);
+    XTestFakeKeyEvent(dpy, code, False, CurrentTime);
+
+    XFlush( dpy );
+
+    XCloseDisplay( dpy );
+
+
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)

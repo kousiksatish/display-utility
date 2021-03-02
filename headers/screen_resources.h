@@ -7,6 +7,7 @@ extern "C"
 // central X11 headers can be included.
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
+#include <X11/extensions/XTest.h>
 }
 #include "output_resolution.h"
 #include "output_resolution_with_offset.h"

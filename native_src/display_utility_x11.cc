@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 #include "../headers/display_utility_x11.h"
 #include "../headers/x11_util.h"
 
@@ -256,23 +257,4 @@ std::unique_ptr<OutputResolution> DisplayUtilityX11::GetExtendedMonitorResolutio
 
     return extendedResolution;
 }
-
-void DisplayUtilityX11::UnicodeTap(const char* unicode) {
-    KeySym sym = XStringToKeysym(unicode);
-    KeyCode code = XKeysymToKeycode(display_,sym);
-
-    int min, max, numcodes;
-    XDisplayKeycodes(display_,&min,&max);
-    KeySym *keysym;
-    keysym = XGetKeyboardMapping(display_,min,max-min+1,&numcodes);
-    keysym[(max-min-1)*numcodes]=sym;
-    XChangeKeyboardMapping(display_,min,numcodes,keysym,(max-min));
-    XFree(keysym);
-    XFlush(display_);
-
-    XTestFakeKeyEvent(display_, code, True, 1);
-    XTestFakeKeyEvent(display_, code, False, 1);
-    XFlush(display_);
-}
-
 } // namespace remoting
