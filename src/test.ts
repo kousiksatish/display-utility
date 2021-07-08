@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { displayUtility, lockUtility, screenCaptureUtility } from './index';
+import { displayUtility, lockUtility, screenCaptureUtility, userSessionUtility } from './index';
 
 // tslint:disable-next-line:no-console
 console.log(displayUtility.getConnectedOutputs());
@@ -84,3 +84,6 @@ function processFrame(): void {
 }
 
 // testForceFrame();
+
+// tslint:disable-next-line: no-console
+console.log(userSessionUtility.getUserSessionInfo());
